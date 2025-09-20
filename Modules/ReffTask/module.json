@@ -1,0 +1,13 @@
+{
+    "name": "ReffTask",
+    "alias": "refftask",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\ReffTask\\Providers\\ReffTaskServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

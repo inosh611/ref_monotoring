@@ -1,0 +1,13 @@
+{
+    "name": "Dealers",
+    "alias": "dealers",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Dealers\\Providers\\DealersServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}
