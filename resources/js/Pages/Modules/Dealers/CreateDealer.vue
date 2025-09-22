@@ -138,7 +138,7 @@ async function handleSubmit() {
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label for="dealers_contact_number">Contact number</label>
-                                        <input type="number" class="form-control" id="dealers_contact_number" required
+                                        <input type="text" class="form-control" id="dealers_contact_number" required
                                             placeholder="Contact Number" v-model="dealer_contact_number">
                                     </div>
                                     <div class="col-md-6 mb-3">
@@ -180,16 +180,6 @@ async function handleSubmit() {
                                         <label for="business_address">Address of the Business</label>
                                         <input type="text" class="form-control" id="business_address" required
                                             placeholder="Address of the Business" v-model="business_address">
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="dealers_contact_number">Contact number</label>
-                                        <input type="number" class="form-control" id="dealers_contact_number" required
-                                            placeholder="Contact Number" v-model="dealer_contact_number">
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="dealers_contact_number">Address</label>
-                                        <input type="text" class="form-control" id="dealers_address" required
-                                            placeholder="Address" v-model="dealer_address">
                                     </div>
                                      <div class="col-md-6 mb-3">
                                         <label for="business_tel">Business Tell</label>

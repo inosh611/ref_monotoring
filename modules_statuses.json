@@ -28,5 +28,6 @@
     "Dealers": true,
     "Orders": true,
     "Task": true,
-    "Chat": true
+    "Chat": true,
+    "MyVisiting": true
 }

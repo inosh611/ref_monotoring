@@ -1,0 +1,13 @@
+{
+    "name": "MyVisiting",
+    "alias": "myvisiting",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\MyVisiting\\Providers\\MyVisitingServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

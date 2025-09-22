@@ -14,9 +14,10 @@ class Shop extends Model
         'business_address',
         'business_tel',
         'registration_doc',
-        'sign_application'.
+        'sign_application',
         'photo_of_the_shop',
-        'owner_id'
+        'owner_id',
+        'business_name'
     ];
 
     public function owner()

@@ -55,4 +55,9 @@ trait ApiCrudTrait
     {
         return $this->model->findOrFail($id)->delete();
     }
+
+     public function allData()
+    {
+        return $this->model->query()->get();
+    }
 }

@@ -22,5 +22,8 @@ Route::middleware('auth:api')->get('/dealer', function (Request $request) {
 Route::middleware(['web','auth'])->prefix('admin/dealer')->group(function() {
     Route::post('/store',[DealersController::class, 'store'])->name('dealer.store');
     Route::post('/update',[DealersController::class, 'update'])->name('dealer.update');
-     Route::post('/delete',[DealersController::class, 'destroy'])->name('dealer.delete');
+    Route::post('/delete',[DealersController::class, 'destroy'])->name('dealer.delete');
+    Route::get('/show/{id}',[DealersController::class, 'show'])->name('dealer.show');
+    Route::get('/all',[DealersController::class, 'all'])->name('dealer.all');
+
 });
