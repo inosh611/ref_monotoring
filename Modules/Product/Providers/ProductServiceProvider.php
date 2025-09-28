@@ -1,22 +1,22 @@
 <?php
 
-namespace Modules\Orders\Providers;
+namespace Modules\Product\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
-use Modules\Orders\Providers\RepositoryServiceProvider;
+use Modules\Product\Providers\RepositoryServiceProvider;
 
-class OrdersServiceProvider extends ServiceProvider
+class ProductServiceProvider extends ServiceProvider
 {
     /**
      * @var string $moduleName
      */
-    protected $moduleName = 'Orders';
+    protected $moduleName = 'Product';
 
     /**
      * @var string $moduleNameLower
      */
-    protected $moduleNameLower = 'orders';
+    protected $moduleNameLower = 'product';
 
     /**
      * Boot the application events.
@@ -39,7 +39,7 @@ class OrdersServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->register(RouteServiceProvider::class);
-        $this->app->register(RepositoryServiceProvider::class);
+         $this->app->register(RepositoryServiceProvider::class);
     }
 
     /**

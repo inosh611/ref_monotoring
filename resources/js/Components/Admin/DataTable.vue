@@ -22,6 +22,7 @@ const props = defineProps<{
     use_view_modal?: boolean;         // New: Flag to use the modal for viewing
     view_button_text?: string;
     edit_modal?: boolean;//new chang
+    edit_modalId?: string;
     use_view_button?: boolean;
 
 }>();
@@ -101,6 +102,7 @@ const viewProduct = (row: any) => {
 const editProduct = (row: any) => {//new changes
     if (props.edit_modal) {
         emit('edit-item', row);
+        $(props.edit_modalId).modal('show');
     } else {
         const url = route(props.edit_route_name, { id: row.id });
         window.location.href = url;
@@ -170,7 +172,7 @@ defineExpose({
                 {{ props.title }}
             </div>
             <div class="col-2">
-                <input v-model="search" type="text" placeholder="Search products..." class="form-control mb-3" />
+                <input v-model="search" type="text" placeholder="Search..." class="form-control mb-3" />
             </div>
         </div>
         <vue3-datatable :rows="products" :columns="cols" :totalRows="total" :currentPage="page" :pageSize="perPage"
@@ -180,7 +182,7 @@ defineExpose({
 
             <template #[`actions`]="slotProps">
                 <div class="btn-group" role="group">
-                    <button class="btn btn-sm btn-primary mr-2" @click="viewProduct(slotProps.value)" v-if="use_view_button">View</button>
+                    <button class="btn btn-sm btn-primary mr-2" @click="viewProduct(slotProps.value)" v-if="props.use_view_button">View</button>
                     <button class="btn btn-sm btn-warning mr-2" @click="editProduct(slotProps.value)">Edit</button>
                     <button class="btn btn-sm btn-danger mr-2"
                         @click="confirmDeleteProduct(slotProps.value)">Delete</button>

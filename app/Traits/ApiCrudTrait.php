@@ -1,13 +1,14 @@
 <?php
 
 namespace App\Traits;
+
 use Illuminate\Http\Request;
 
 trait ApiCrudTrait
 {
     public function dataTable(Request $request)
     {
-         $query = $this->model->newQuery();
+        $query = $this->model->newQuery();
 
         if ($request) {
             $pageSize = $request->input('page.pagesize', 10);
@@ -23,14 +24,19 @@ trait ApiCrudTrait
 
             $results = $query->paginate($pageSize, ['*'], 'page', $request->input('page.current_page', 1));
 
+            $start  = $results->firstItem(); // 1-based; null if empty
+            $rows = collect($results->items())->values()->map(function ($row, $i) use ($start) {
+                $row->row_num = ($start ?? 0) + $i; // 1,2,3... per page
+                return $row;
+            });
             return [
-                'data' => $results->items(),
+                'data' => $rows,
                 'total' => $results->total(),
                 'current_page' => $results->currentPage(),
                 'last_page' => $results->lastPage(),
             ];
         }
-        
+
         return $query->get();
     }
 
@@ -56,7 +62,7 @@ trait ApiCrudTrait
         return $this->model->findOrFail($id)->delete();
     }
 
-     public function allData()
+    public function allData()
     {
         return $this->model->query()->get();
     }

@@ -1,7 +1,8 @@
 <?php
 
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Route;
+use Modules\Orders\Http\Controllers\OrdersController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -13,6 +14,10 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/orders', function (Request $request) {
-    return $request->user();
+Route::middleware(['web','auth'])->prefix('admin/order')->group(function() {
+    Route::post('/store',[OrdersController::class, 'store'])->name('order.store');
+    Route::post('/update',[OrdersController::class, 'update'])->name('order.update');
+    Route::post('/delete',[OrdersController::class, 'destroy'])->name('order.delete');
+    Route::get('/show/{id}',[OrdersController::class, 'show'])->name('order.show');
+    Route::get('/all',[OrdersController::class, 'all'])->name('order.all');
 });

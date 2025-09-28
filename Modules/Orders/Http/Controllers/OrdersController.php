@@ -2,12 +2,15 @@
 
 namespace Modules\Orders\Http\Controllers;
 
-use Illuminate\Contracts\Support\Renderable;
+use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Support\Collection; // Remove When start Backend
+use Modules\Dealers\Repositories\Interfaces\DealerRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator; // Remove When start Backend
-use Inertia\Inertia;
+use Modules\Orders\Repositories\Interfaces\OrderRepositoryInterface;
+
 
 class OrdersController extends Controller
 {
@@ -15,6 +18,16 @@ class OrdersController extends Controller
      * Display a listing of the resource.
      * @return Renderable
      */
+        Protected $dealerRepository;
+        protected $orderRepository;
+        public function __construct(DealerRepositoryInterface $dealerRepository, OrderRepositoryInterface $orderRepository)
+        {
+            $this->dealerRepository = $dealerRepository;
+            $this->orderRepository = $orderRepository;
+        }
+
+
+
     public function dataTable(Request $request) // Remove When start Backend
     {
         // Sample items
@@ -74,7 +87,9 @@ class OrdersController extends Controller
      */
     public function create()
     {
-        return view('orders::create');
+        $dealers = $this->dealerRepository->allData();
+        $user = auth()->user();
+        return Inertia::render('Modules/Orders/CreateOrder', ['dealers' => $dealers, 'user'=>$user]);
     }
 
     /**
@@ -84,7 +99,7 @@ class OrdersController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        dd($request->all());
     }
 
     /**

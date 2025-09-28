@@ -63,6 +63,40 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a :href="route('product.index')" class="nav-link">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="mr-2"
+                                width="25"
+                                height="25"
+                                viewBox="0 0 2048 2048"
+                            >
+                                <path
+                                    fill="currentColor"
+                                    d="m960 120l832 416v1040l-832 415l-832-415V536l832-416zm625 456L960 264L719 384l621 314l245-122zM960 888l238-118l-622-314l-241 120l625 312zM256 680v816l640 320v-816L256 680zm768 1136l640-320V680l-640 320v816z"
+                                />
+                            </svg>
+                            <p>Products</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a :href="route('unit.index')" class="nav-link">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="mr-2"
+                                width="25"
+                                height="25"
+                                viewBox="0 0 2048 2048"
+                            >
+                                <path
+                                    fill="currentColor"
+                                    d="m960 120l832 416v1040l-832 415l-832-415V536l832-416zm625 456L960 264L719 384l621 314l245-122zM960 888l238-118l-622-314l-241 120l625 312zM256 680v816l640 320v-816L256 680zm768 1136l640-320V680l-640 320v816z"
+                                />
+                            </svg>
+                            <p>Units</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a :href="route('order.index')" class="nav-link">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"

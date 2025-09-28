@@ -77,7 +77,7 @@ onMounted(() => {
                     <div class="col-12">
                         <a href=""><button class="btn btn-primary mr-2">Export Orders</button></a>
                         <button class="btn btn-primary mr-2">Import Orders</button>
-                        <a :href="route('customer.create')"><button class="btn btn-primary mr-2">Create
+                        <a :href="route('order.create')"><button class="btn btn-primary mr-2">Create
                                 Order</button></a>
                     </div>
                 </div>
