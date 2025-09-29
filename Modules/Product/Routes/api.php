@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Modules\Product\Http\Controllers\ProductController;
+use Modules\Product\Http\Controllers\ProductPriceController;
 use Modules\Product\Http\Controllers\UnitController;
 
 /*
@@ -30,4 +31,11 @@ Route::middleware(['web','auth'])->prefix('admin/unit')->group(function() {
     Route::post('/delete',[UnitController::class, 'destroy'])->name('unit.delete');
     Route::get('/show/{id}',[UnitController::class, 'show'])->name('unit.show');
     Route::get('/all',[UnitController::class, 'all'])->name('unit.all');
+});
+Route::middleware(['web','auth'])->prefix('admin/product-price')->group(function() {
+    Route::post('/store',[ProductPriceController::class, 'store'])->name('product.price.store');
+    Route::post('/update',[ProductPriceController::class, 'update'])->name('product.price.update');
+    Route::post('/delete',[ProductPriceController::class, 'destroy'])->name('product.price.delete');
+    Route::get('/show/{id}',[ProductPriceController::class, 'show'])->name('product.price.show');
+    Route::get('/all',[ProductPriceController::class, 'all'])->name('product.price.all');
 });

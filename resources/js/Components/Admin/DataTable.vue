@@ -7,7 +7,7 @@ import { useToast } from 'vue-toastification'
 import axios from 'axios';
 
 const toast = useToast();
-const emit = defineEmits(['edit-item']);//new change
+const emit = defineEmits(['edit-item', 'change-price']);
 const props = defineProps<{
     title: string,
     fetch_url: string,
@@ -24,6 +24,8 @@ const props = defineProps<{
     edit_modal?: boolean;//new chang
     edit_modalId?: string;
     use_view_button?: boolean;
+    use_new_price_button?: boolean;
+    price_modal_id?: string;
 
 }>();
 const products = ref([]);
@@ -113,7 +115,11 @@ const confirmDeleteProduct = (row: any) => {
     modal_data.value = row;
     $('#deleteModal').modal('show');
 }
-
+const changePrice = (row: any) => {
+    console.log("Change price row:", props.price_modal_id);
+    $(props.price_modal_id).modal('show');
+    emit('change-price', row);
+};
 const deleteProduct = () => {
     if (modal_data.value != null) {
         const formData = new FormData();
@@ -182,6 +188,7 @@ defineExpose({
 
             <template #[`actions`]="slotProps">
                 <div class="btn-group" role="group">
+                    <button class="btn btn-sm btn-success mr-2" @click="changePrice(slotProps.value)" v-if="props.use_new_price_button">Price</button>
                     <button class="btn btn-sm btn-primary mr-2" @click="viewProduct(slotProps.value)" v-if="props.use_view_button">View</button>
                     <button class="btn btn-sm btn-warning mr-2" @click="editProduct(slotProps.value)">Edit</button>
                     <button class="btn btn-sm btn-danger mr-2"
