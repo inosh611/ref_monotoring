@@ -6,7 +6,9 @@ const toast = useToast();
 
 export const store = (submit_route, form_data) => {
     axios
-        .post(route(submit_route), form_data, { headers: { 'Content-Type': 'multipart/form-data' } })
+        .post(route(submit_route), form_data, {
+            headers: { "Content-Type": "multipart/form-data" },
+        })
         .then((response) => {
             // toast.success("Product Successfully Created");
             toast.success(response.data.message);
@@ -49,13 +51,14 @@ export const fetchData = async (url, dataRef) => {
     }
 };
 
-export const searchProduct = async (url) => {
+export const searchData = async (route_name, searchKey) => {
     try {
-        const response = await axios.get(url);
-        return response.data;
-    } catch (error) {
-            console.error("An error occurred:", error);
+        const { data } = await axios.get(route(route_name), {
+            params: { search: searchKey },
+        });
+        return data;
+    } catch (e) {
+        console.error(e);
         return [];
     }
-
-}
+};

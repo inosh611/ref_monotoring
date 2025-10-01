@@ -23,6 +23,7 @@ Route::middleware(['web','auth'])->prefix('admin/product')->group(function() {
     Route::post('/delete',[ProductController::class, 'destroy'])->name('product.delete');
     Route::get('/show/{id}',[ProductController::class, 'show'])->name('product.show');
     Route::get('/all',[ProductController::class, 'all'])->name('product.all');
+    Route::get('/products/search', [ProductController::class, 'search'])->name('products.search');
 });
 
 Route::middleware(['web','auth'])->prefix('admin/unit')->group(function() {

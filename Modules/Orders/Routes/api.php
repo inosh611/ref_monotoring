@@ -20,4 +20,5 @@ Route::middleware(['web','auth'])->prefix('admin/order')->group(function() {
     Route::post('/delete',[OrdersController::class, 'destroy'])->name('order.delete');
     Route::get('/show/{id}',[OrdersController::class, 'show'])->name('order.show');
     Route::get('/all',[OrdersController::class, 'all'])->name('order.all');
+    
 });

@@ -54,4 +54,8 @@ class ProductRepository implements ProductRepositoryInterface
 
         return $query->get();
     }
+    public function search($term)
+    {
+        return $this->model->where('product_name', 'like', '%' . $term . '%')->with('unit', 'productPrice', 'latestPrice')->get();
+    }
 }

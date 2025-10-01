@@ -152,4 +152,13 @@ class ProductController extends Controller
             return redirect()->back()->with('error', 'Failed to delete product: ' . $e->getMessage());
         }
     }
+
+    
+public function search(Request $request)
+{
+    $search = (string) $request->query('search', '');
+    $results = $this->productRepository->search($search);
+
+    return response()->json(['results' => $results]);
+}
 }
