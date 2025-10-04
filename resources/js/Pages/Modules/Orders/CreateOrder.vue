@@ -2,7 +2,7 @@
 import AdminLayout from "@/Layouts/Admin/AdminLayout.vue";
 import DataTable from "@/Components/Admin/DataTable.vue";
 import { Head } from "@inertiajs/vue3";
-import { onMounted, ref, watch, nextTick  } from "vue";
+import { onMounted, ref, watch, nextTick } from "vue";
 import { useToast } from "vue-toastification";
 import { store, searchData } from "../../../main";
 import $ from "jquery";
@@ -23,6 +23,8 @@ const product_prices = ref([]);
 const selected_price = ref("");
 const selectedProduct_name = ref("");
 const selected_product_price = ref([]);
+const show_product_price = ref("");
+const totalPrice = ref(0);
 
 const props = defineProps({
     dealers: {
@@ -39,28 +41,55 @@ user_details.value = props.user.first_name + " " + props.user.last_name;
 
 const addItemToList = () => {
     const form = itemAddFormRef.value;
-    if (form.checkValidity() === false) {
+
+    if (form && form.checkValidity && form.checkValidity() === false) {
         toast.error("Please fill out all required fields.");
         form.classList.add("was-validated");
         return;
     }
+    
+    const product = selectedProduct?.value;
+    const priceObj = selected_product_price?.value;
+    const qty = Number(itemQuantity.value);
 
-    itemList.value.push({
-        product_id: selectedProduct.value.id,
-        name: selectedProduct.value.product_name,
-        quantity: itemQuantity.value,
-        price_id: selected_product_price.value.id,
-        price: selected_product_price.value.price,
-        sub_total: itemQuantity.value * selected_product_price.value.price,
-    });
+    if (!product?.id || !priceObj?.id) {
+        toast.error("Please select a product and a price.");
+        return;
+    }
+    if (!qty || qty <= 0) {
+        toast.error("Quantity must be greater than 0.");
+        return;
+    }
+    const unitPrice = Number(priceObj.price);
+
+    const existing = itemList.value.find(
+        (row) => row.product_id === product.id && row.price_id === priceObj.id
+    );
+
+    if (existing) {
+        existing.quantity = Number(existing.quantity) + qty;
+        existing.sub_total = Number(existing.quantity) * Number(existing.price);
+        totalPrice.value += qty * unitPrice;
+    } else {
+        totalPrice.value += qty * unitPrice;
+        itemList.value.push({
+            product_id: product.id,
+            name: product.product_name ?? product.name ?? "",
+            quantity: qty,
+            price_id: priceObj.id,
+            price: unitPrice,
+            sub_total: qty * unitPrice,
+        });
+    }
+
     itemName.value = "";
     itemQuantity.value = "";
-    // Use nextTick to ensure DOM updates
+    show_product_price.value = "";
     nextTick(() => {
-        form.classList.remove("was-validated");
+        form?.classList.remove("was-validated");
     });
 
-    console.log("Class List:", form.classList);
+    console.log("Class List:", form?.classList);
 };
 
 const submitOrder = () => {
@@ -74,6 +103,8 @@ const submitOrder = () => {
         formData.append("dealer_id", dealer_id.value);
         formData.append("user_id", props.user.id);
         formData.append("order_status", "Pending");
+        formData.append("total_price", totalPrice.value);
+        formData.append("Payment_status", "Pending");
 
         store("order.store", formData);
     }
@@ -128,6 +159,7 @@ const submitPrice = (price_id) => {
         return;
     }
     selected_product_price.value = chosen;
+    show_product_price.value = chosen.price;
     console.log("Selected product with price:", chosen);
 };
 document.addEventListener("click", (event) => {
@@ -144,6 +176,27 @@ watch(itemName, (newVal, oldVal) => {
         searchItem(newVal);
     }
 });
+
+watch(itemName, (newVal, oldVal) => {
+    if (searchStatus.value) {
+        searchItem(newVal);
+    } else if (selectedProduct_name.value !== newVal) {
+        searchStatus.value = true;
+        searchItem(newVal);
+    }
+});
+
+watch(
+    itemList,
+    (rows) => {
+        rows.forEach((it) => {
+            it.quantity = Number(it.quantity) || 0;
+            it.price = Number(it.price) || 0;
+            it.sub_total = it.quantity * it.price;
+        });
+    },
+    { deep: true }
+);
 
 onMounted(() => {});
 </script>
@@ -186,7 +239,7 @@ onMounted(() => {});
                             <div class="card-body">
                                 <h5 class="w-75 mb-3 text-bold">
                                     CUSTOMER Details
-                                    {{ itemList }}
+                                    {{ totalPrice }}
                                 </h5>
 
                                 <div class="row">
@@ -289,6 +342,20 @@ onMounted(() => {});
                                         <div class="form-group">
                                             <label
                                                 for="exampleFormControlSelect1"
+                                                >Price</label
+                                            >
+                                            <input
+                                                type="number"
+                                                class="form-control"
+                                                v-model="show_product_price"
+                                                disabled
+                                            />
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-12">
+                                        <div class="form-group">
+                                            <label
+                                                for="exampleFormControlSelect1"
                                                 >Quantity</label
                                             >
                                             <input
@@ -299,8 +366,10 @@ onMounted(() => {});
                                             />
                                         </div>
                                     </div>
-                                    <div
-                                        class="col-lg-4 col-12 d-flex align-items-center mt-3"
+                                </div>
+                                <div class="row justify-content-end">
+                                      <div
+                                        class="col-lg-4 col-12 d-flex align-items-end justify-content-end mt-3"
                                     >
                                         <button
                                             type="submit"
@@ -347,14 +416,14 @@ onMounted(() => {});
                                     <div class="row">
                                         <div class="col-12">
                                             <table class="table table-striped">
-                                                    <tr>
-                                                        <th>#</th>
-                                                        <th>Item Name</th>
-                                                        <th>Price (LKR)</th>
-                                                        <th>Quantity</th>
-                                                        <th>Sub Total (LKR)</th>
-                                                        <th>Action</th>
-                                                    </tr>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Item Name</th>
+                                                    <th>Price (LKR)</th>
+                                                    <th>Quantity</th>
+                                                    <th>Sub Total (LKR)</th>
+                                                    <th>Action</th>
+                                                </tr>
                                                 <tbody v-if="itemList.length">
                                                     <tr
                                                         v-for="(
@@ -382,7 +451,9 @@ onMounted(() => {});
                                                                 "
                                                             />
                                                         </td>
-                                                        <td>{{ item.sub_total }}</td>
+                                                        <td>
+                                                            {{ item.sub_total }}
+                                                        </td>
 
                                                         <td>
                                                             <svg
@@ -409,6 +480,19 @@ onMounted(() => {});
                                                 <div class="empty-order" v-else>
                                                     <P>No Item Yet</P>
                                                 </div>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="row d-flex justify-content-end" v-if="itemList.length">
+                                        <div class="col-lg-4 col-12">
+                                            <table class="table table-bordered">
+                                                <tbody>
+                                                    <tr>
+                                                        <td>TOTAL (LKR)</td>
+                                                        <td>{{ totalPrice }}</td>
+                                                    </tr>
+                                                    
+                                                </tbody>
                                             </table>
                                         </div>
                                     </div>
