@@ -110,7 +110,6 @@ class OrdersController extends Controller
         try {
             DB::beginTransaction();
             $orderDetails = [
-                'order_number' => $validated['order_number'],
                 'shop_id' => $validated['shop_id'],
                 'user_id' => $validated['user_id'],
                 'order_status' => $validated['order_status'],
@@ -121,17 +120,16 @@ class OrdersController extends Controller
             $itemList = $validated['item_list'];
             if ($order && !empty($itemList)) {
                 foreach ($itemList as $item) {
-                    $itemDetails['order_id'] = $order->id;
-                    $itemDetails['product_id'] = $item['product_id'];
-                    $itemDetails['price_id'] = $item['price_id'];
-                    $itemDetails['quantity'] = $item['quantity'];
-                    $itemDetails['price'] = $item['price'];
-                    $itemDetails['sub_total'] = $item['sub_total'];
-                    $this->itemRepository->create($itemDetails);
+                    $item['order_id'] = $order->id;
+                    $this->itemRepository->create($item);
                 }
                
             }
             DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Order Successfully Saved.',
+                'redirect' => route('order.index')]);
            
         } catch (\Exception $e) {
             DB::rollBack();

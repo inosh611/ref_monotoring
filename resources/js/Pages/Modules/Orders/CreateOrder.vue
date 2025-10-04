@@ -103,7 +103,6 @@ const submitOrder = () => {
         return;
     } else {
         const formData = new FormData();
-        formData.append("order_number", props.orderCount + 1);
         formData.append("item_list", JSON.stringify(itemList.value));
         formData.append("shop_id", dealer_id.value);
         formData.append("user_id", props.user.id);

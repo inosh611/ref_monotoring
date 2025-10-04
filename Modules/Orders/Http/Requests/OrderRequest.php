@@ -17,7 +17,6 @@ class OrderRequest extends FormRequest
 
         return [
             'id'=> ['nullable','integer'],
-            'order_number'=> ['required','string','max:255'],
             'shop_id'=> ['required','integer'],
             'user_id'=> ['required','integer'],
             'order_status'=> ['required','string','max:255'],
