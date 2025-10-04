@@ -2,7 +2,7 @@
 namespace Modules\Orders\Repositories\Interfaces;
 use Illuminate\Http\Request;
 
-interface OrderRepositoryInterface{
+interface ItemRepositoryInterface{
 
     public function dataTable(Request $request);
     public function find($id);
@@ -10,6 +10,6 @@ interface OrderRepositoryInterface{
     public function update($id, array $data);
     public function delete($id);
     public function allData();
-    public function orderCount();
+   
 }
 ?>

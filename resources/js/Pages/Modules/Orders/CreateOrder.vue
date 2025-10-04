@@ -25,6 +25,7 @@ const selectedProduct_name = ref("");
 const selected_product_price = ref([]);
 const show_product_price = ref("");
 const totalPrice = ref(0);
+const order_number = ref("");
 
 const props = defineProps({
     dealers: {
@@ -33,6 +34,10 @@ const props = defineProps({
     },
     user: {
         type: Object,
+        required: true,
+    },
+    orderCount: {
+        type: Number,
         required: true,
     },
 });
@@ -98,14 +103,14 @@ const submitOrder = () => {
         return;
     } else {
         const formData = new FormData();
-
+        formData.append("order_number", props.orderCount + 1);
         formData.append("item_list", JSON.stringify(itemList.value));
-        formData.append("dealer_id", dealer_id.value);
+        formData.append("shop_id", dealer_id.value);
         formData.append("user_id", props.user.id);
         formData.append("order_status", "Pending");
         formData.append("total_price", totalPrice.value);
-        formData.append("Payment_status", "Pending");
-
+        formData.append("payment_status", "Pending");
+        
         store("order.store", formData);
     }
 };

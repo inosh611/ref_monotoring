@@ -4,13 +4,16 @@ namespace Modules\Orders\Http\Controllers;
 
 use Inertia\Inertia;
 use Illuminate\Http\Request;
+use Modules\Orders\Entities\Item;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\Support\Renderable;
+use Modules\Orders\Http\Requests\OrderRequest;
+use Modules\Orders\Repositories\ItemRepository;
 use Illuminate\Support\Collection; // Remove When start Backend
+use Modules\Orders\Repositories\Interfaces\OrderRepositoryInterface;
 use Modules\Dealers\Repositories\Interfaces\DealerRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator; // Remove When start Backend
-use Modules\Orders\Repositories\Interfaces\OrderRepositoryInterface;
-
 
 class OrdersController extends Controller
 {
@@ -18,13 +21,15 @@ class OrdersController extends Controller
      * Display a listing of the resource.
      * @return Renderable
      */
-        Protected $dealerRepository;
-        protected $orderRepository;
-        public function __construct(DealerRepositoryInterface $dealerRepository, OrderRepositoryInterface $orderRepository)
-        {
-            $this->dealerRepository = $dealerRepository;
-            $this->orderRepository = $orderRepository;
-        }
+    protected $dealerRepository;
+    protected $orderRepository;
+    protected $itemRepository;
+    public function __construct(DealerRepositoryInterface $dealerRepository, OrderRepositoryInterface $orderRepository, ItemRepository $itemRepository)
+    {
+        $this->dealerRepository = $dealerRepository;
+        $this->orderRepository = $orderRepository;
+        $this->itemRepository = $itemRepository;
+    }
 
 
 
@@ -88,8 +93,9 @@ class OrdersController extends Controller
     public function create()
     {
         $dealers = $this->dealerRepository->allData();
+        $orderCount = $this->orderRepository->orderCount();
         $user = auth()->user();
-        return Inertia::render('Modules/Orders/CreateOrder', ['dealers' => $dealers, 'user'=>$user]);
+        return Inertia::render('Modules/Orders/CreateOrder', ['dealers' => $dealers, 'user' => $user, 'orderCount' => $orderCount]);
     }
 
     /**
@@ -97,9 +103,46 @@ class OrdersController extends Controller
      * @param Request $request
      * @return Renderable
      */
-    public function store(Request $request)
+    public function store(OrderRequest $request)
     {
-        dd($request->all());
+
+        $validated = $request->validated();
+        try {
+            DB::beginTransaction();
+            $orderDetails = [
+                'order_number' => $validated['order_number'],
+                'shop_id' => $validated['shop_id'],
+                'user_id' => $validated['user_id'],
+                'order_status' => $validated['order_status'],
+                'payment_status' => $validated['payment_status'],
+                'total_price' => $validated['total_price'],
+            ];
+            $order = $this->orderRepository->create($orderDetails);
+            $itemList = $validated['item_list'];
+            if ($order && !empty($itemList)) {
+                foreach ($itemList as $item) {
+                    $itemDetails['order_id'] = $order->id;
+                    $itemDetails['product_id'] = $item['product_id'];
+                    $itemDetails['price_id'] = $item['price_id'];
+                    $itemDetails['quantity'] = $item['quantity'];
+                    $itemDetails['price'] = $item['price'];
+                    $itemDetails['sub_total'] = $item['sub_total'];
+                    $this->itemRepository->create($itemDetails);
+                }
+               
+            }
+            DB::commit();
+           
+        } catch (\Exception $e) {
+            DB::rollBack();
+            dd($e);
+            // return response()->json([
+            //     'success' => false,
+            //     'message' => 'Order Creation Failed. Error: ' . $e->getMessage(),
+            //     'redirect' => route('orders.index')
+            // ], 500);
+        }
+        
     }
 
     /**
