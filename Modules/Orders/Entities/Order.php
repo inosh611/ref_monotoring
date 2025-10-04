@@ -2,6 +2,7 @@
 
 namespace Modules\Orders\Entities;
 
+use App\Models\User;
 use Illuminate\Support\Str;
 use Modules\Dealers\Entities\Shop;
 use Illuminate\Database\Eloquent\Model;
@@ -24,19 +25,25 @@ class Order extends Model
     {
         return $this->hasMany(Item::class);
     }
+
     public function shop()
     {
         return $this->belongsTo(Shop::class);
     }
+    
+    public function user(){
+        return $this->belongsTo(User::class);
+    }
+
     public function owner()
     {
         return $this->hasOneThrough(
             'Modules\Dealers\Entities\Owner',
             'Modules\Dealers\Entities\Shop',
-            'id', // Foreign key on shops table...
-            'id', // Foreign key on owners table...
-            'shop_id', // Local key on orders table...
-            'owner_id' // Local key on shops table...
+            'id', // Foreign key on shops table
+            'id', // Foreign key on owners table
+            'shop_id', // Local key on orders table
+            'owner_id' // Local key on shops table
         );
     }
 
