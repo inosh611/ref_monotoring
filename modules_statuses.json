@@ -29,5 +29,6 @@
     "Orders": true,
     "Task": true,
     "Chat": true,
-    "MyVisiting": true
+    "MyVisiting": true,
+    "MyCollections": true
 }
