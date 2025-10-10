@@ -23,7 +23,7 @@ class ProductController extends Controller
     protected $productRepository;
     protected $productPriceRepository;
 
-    public function __construct(UnitRepositoryInterface $unitRepository, ProductRepositoryInterface $productRepository, ProductPriceRepository $productPriceRepository){
+    public function __construct(UnitRepositoryInterface $unitRepository, ProductRepositoryInterface $productRepository, ProductRepositoryInterface $productPriceRepository){
             $this->unitRepository = $unitRepository;
             $this->productRepository = $productRepository;
             $this->productPriceRepository = $productPriceRepository;

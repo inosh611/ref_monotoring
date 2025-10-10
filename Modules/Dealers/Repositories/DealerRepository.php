@@ -68,4 +68,8 @@ class DealerRepository implements DealerRepositoryInterface
     {
         return $this->model->with('owner')->findOrFail($id);
     }
+     public function search($dealerKey)
+    {
+        return $this->model->where('business_name', 'like', '%' . $dealerKey . '%')->with('owner')->get();
+    }
 }

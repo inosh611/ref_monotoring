@@ -3,13 +3,23 @@ import AdminLayout from "@/Layouts/Admin/AdminLayout.vue";
 import DataTable from "@/Components/Admin/DataTable.vue";
 import { Head } from "@inertiajs/vue3";
 import { onMounted, ref } from "vue";
+import { useToast } from "vue-toastification";
+import { update } from "../../../main";
+
+const toast = useToast();
+const formRef = ref(null);
+const selectedOrderStatus = ref("Pending");
+const order_id = ref(null);
+const orderItems = ref([]);
+const shop_id = ref(null);
+
 // Define product table columns
 const customer_table_columns = [
     { field: "row_num", title: "#", isUnique: true, width: "30px" },
     // { field: "id", title: "ID", isUnique: true },
     { field: "order_number", title: "Order Number" },
     { field: "business_name", title: "Shop Name" },
-     { field: "user.id", title: "Ref" },
+    { field: "user.id", title: "Ref" },
     {
         field: "order_status",
         title: "Order Status",
@@ -51,7 +61,34 @@ const customer_table_columns = [
     { field: "actions", title: "Actions", cellRenderer: false, width: "50px" },
 ];
 
+const changeOrderStatus = (row) => {
+    selectedOrderStatus.value = row.order_status;
+    orderItems.value = row.items;
+    order_id.value = row.id;
+    shop_id.value = row.shop_id;
+    console.log("Order Details:", row.order_status);
+};
+
+async function handleUpdate() {
+    console.log("Updating order with ID:", order_id.value);
+    const form = formRef.value;
+    if (form.checkValidity() === false) {
+        toast.error("Please fill out all required fields.");
+        form.classList.add("was-validated");
+        return;
+    }
+    const formData = new FormData();
+
+    formData.append("id", order_id.value);
+    formData.append("order_status", selectedOrderStatus.value);
+    formData.append("items", JSON.stringify(orderItems.value));
+    formData.append("order_id", order_id.value);
+    formData.append("shop_id", shop_id.value);
+    update("order.update", formData);
+}
+
 onMounted(() => {});
+
 </script>
 
 <template>
@@ -112,6 +149,9 @@ onMounted(() => {});
                                     edit_route_name="order.edit"
                                     delete_route_name="order.delete"
                                     view_button="false"
+                                    :use_order_status_button="true"
+                                    @change-order-status="changeOrderStatus"
+                                    order_status_modal="#change-order-status-modal"
                                 />
                             </div>
                         </div>
@@ -119,6 +159,75 @@ onMounted(() => {});
                 </div>
             </div>
         </section>
+
+        <!-- Modal -->
+        <div
+            class="modal fade"
+            id="change-order-status-modal"
+            data-backdrop="static"
+            data-keyboard="false"
+            tabindex="-1"
+            aria-labelledby="change-order-status-modal-label"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5
+                            class="modal-title"
+                            id="change-order-status-modal-label"
+                        >
+                            Change Order Status
+                        </h5>
+                        <button
+                            type="button"
+                            class="close"
+                            data-dismiss="modal"
+                            aria-label="Close"
+                        >
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <pre>{{ orderItems }}</pre>
+                     <form
+                            class="needs-validation"
+                            novalidate
+                            @submit.prevent="handleUpdate"
+                            ref="formRef"
+                        >
+                    <div class="modal-body">
+                            <div class="form-group">
+                                <label for="order-status"
+                                    >Select Order Status</label
+                                >
+                                <select
+                                    class="form-control"
+                                    id="order-status"
+                                    v-model="selectedOrderStatus"
+                                >
+                                    <option value="Pending">Pending</option>
+                                    <option value="Delivered">Delivered</option>
+                                    <option value="Confirmed">Confirm</option>
+                                </select>
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-dismiss="modal"
+                            @click="() => { formRef.value.classList.remove('was-validated'); }"
+                        >
+                            Close
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                           Updated
+                        </button>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </AdminLayout>
 </template>
 

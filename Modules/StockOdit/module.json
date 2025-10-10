@@ -1,0 +1,13 @@
+{
+    "name": "StockOdit",
+    "alias": "stockodit",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\StockOdit\\Providers\\StockOditServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

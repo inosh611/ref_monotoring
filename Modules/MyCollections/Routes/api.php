@@ -21,5 +21,6 @@ Route::middleware(['web','auth'])->prefix('admin/my-collection')->group(function
     Route::post('/delete',[MyCollectionsController::class, 'destroy'])->name('my.collection.delete');
     Route::get('/show/{id}',[MyCollectionsController::class, 'show'])->name('my.collection.show');
     Route::get('/all',[MyCollectionsController::class, 'all'])->name('my.collection.all');
+    Route::get('/search-order',[MyCollectionsController::class, 'searchOrder'])->name('my.collection.search.order');
     
 });

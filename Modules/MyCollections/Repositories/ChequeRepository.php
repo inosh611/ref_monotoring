@@ -4,6 +4,7 @@ use App\Traits\ApiCrudTrait;
 use Modules\MyCollections\Entities\Cheque;
 use Modules\MyCollections\Repositories\Interfaces\ChequeRepositoryInterface;
 
+
 class ChequeRepository implements ChequeRepositoryInterface{
     use ApiCrudTrait;
 

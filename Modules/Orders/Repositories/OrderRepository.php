@@ -44,7 +44,7 @@ class OrderRepository implements OrderRepositoryInterface
             $rows = collect($results->items())->values()->map(function ($row, $i) use ($start) {
                 $row->row_num = ($start ?? 0) + $i; // 1,2,3... per page'
                 if ($row->created_at) {
-                $row->created_at_formatted = \Carbon\Carbon::parse($row->created_at)->format('Y-F-d');
+                $row->created_at_formatted = \Carbon\Carbon::parse($row->created_at)->format('Y-M-d g.i a');
                 $row->business_name = $row->shop ? $row->shop->business_name : null;
     }
                 return $row;
@@ -58,5 +58,17 @@ class OrderRepository implements OrderRepositoryInterface
         }
 
         return $query->get();
+    }
+
+    public function search($orderKey, $shopId)
+    {
+         return $this->model->newQuery()
+        ->when($shopId, fn ($q) => $q->where('shop_id', $shopId))
+        ->when($orderKey, function ($q) use ($orderKey) {
+            $q->where('order_number', 'like', '%' . $orderKey . '%');
+        })
+        ->with(['items'])
+        ->latest()   // newest first
+        ->get();
     }
 }

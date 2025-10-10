@@ -15,6 +15,7 @@ class CreateCashesTable extends Migration
     {
         Schema::create('cashes', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('payment_id')->constrained('payments')->onDelete('cascade');
             $table->string('cash_amount');
             $table->string('cash_amount_text');
             $table->string('cash_receipt_number');

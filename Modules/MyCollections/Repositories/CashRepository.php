@@ -6,6 +6,7 @@ use App\Traits\ApiCrudTrait;
 use Modules\MyCollections\Entities\Cash;
 use Modules\MyCollections\Repositories\Interfaces\CashRepositoryInterface;
 
+
 class CashRepository implements CashRepositoryInterface{
     use ApiCrudTrait;
 

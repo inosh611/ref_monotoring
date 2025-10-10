@@ -23,6 +23,10 @@ const receipt_number = ref("");
 const cash_amount = ref(0);
 const cash_amount_text = ref("");
 const cash_receipt_number = ref("");
+const total_order_amount = ref(0.00);
+const paid_amount = ref(0.00);
+const balance_amount = ref(0.00);
+const comment = ref("");
 
 const toWords = new ToWords({
     localeCode: "en-GB",
@@ -39,21 +43,56 @@ const toWords = new ToWords({
     },
 });
 
+const searchOrder = async (searchKey) => {
+    try {
+        const { data } = await axios.get(route('my.collection.search.order'), {
+            params: { search: searchKey },
+        });
+        return data;
+    } catch (e) {
+        console.error(e);
+        return [];
+    }
+};
+
 watch(cheque_amount, (val) => {
     const n = Number(val);
     cheque_amount_text.value =
         !Number.isNaN(n) && val !== "" ? toWords.convert(n) : "";
+        if(val > balance_amount.value){
+            toast.error("Cheque amount cannot be greater than balance amount.");
+            cheque_amount.value = 0;
+            cheque_amount_text.value = "";
+        }
 });
 
+watch(order_number, async (val) => {
+  if (!val) { orderDetails.value = null; return; }
+
+  try {
+    const res = await searchOrder(val);   // ⬅️ await the Promise
+    total_order_amount.value = res.data ? parseFloat(res.data.total_price).toFixed(2) : 0.00;
+    paid_amount.value = res.data ? parseFloat(res.data.paid_amount).toFixed(2) : 0.00;
+    balance_amount.value = res.data ? (parseFloat(res.data.total_price) - parseFloat(res.data.paid_amount)).toFixed(2) : 0.00;
+    console.log('Order Details', res.data.total_price);
+  } catch (e) {
+    console.error(e);
+    orderDetails.value = null;
+  }
+});
 watch(cash_amount, (val) => {
     const n = Number(val);
     cash_amount_text.value =
         !Number.isNaN(n) && val !== "" ? toWords.convert(n) : "";
+        if(val > balance_amount.value){
+            toast.error("Cash amount cannot be greater than balance amount.");
+            cash_amount.value = 0;
+            cash_amount_text.value = "";
+        }
 });
 
 watch(collection_type, (val) => {
     cheque_number.value = "";
-    order_number.value = "";
     bank.value = "";
     branch.value = "";
     cheque_date.value = "";
@@ -75,6 +114,7 @@ async function handleSubmit() {
     const formData = new FormData();
     formData.append("collection_type", collection_type.value);
     formData.append("order_number", order_number.value);
+    formData.append("comment", comment.value);
     if (collection_type.value == 1) {
         formData.append("cheque_number", cheque_number.value);
         formData.append("bank", bank.value);
@@ -139,7 +179,7 @@ onMounted(() => {});
                                 ref="formRef"
                             >
                                 <div class="row">
-                                    <div class="col-lg-6 col-12">
+                                    <div class="col-lg-4 col-12">
                                         <div class="form-group">
                                             <label for="order-number"
                                                 >Order Number</label
@@ -150,6 +190,60 @@ onMounted(() => {});
                                                 id="order-number"
                                                 placeholder="Order Number"
                                                 v-model="order_number"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-12">
+                                        <div class="form-group">
+                                            <label for="total-amount"
+                                                >Total Amount</label
+                                            >
+                                            <input
+                                                type="number"
+                                                class="form-control"
+                                                id="total-amount"
+                                                placeholder="Total Amount"
+                                                step="0.01"
+                                                min="0"
+                                                disabled
+                                                v-model="total_order_amount"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-12">
+                                        <div class="form-group">
+                                            <label for="paid-amount"
+                                                >Paid Amount</label
+                                            >
+                                            <input
+                                                type="number"
+                                                class="form-control"
+                                                id="paid-amount"
+                                                placeholder="Paid Amount"
+                                                step="0.01"
+                                                min="0"
+                                                disabled
+                                                v-model="paid_amount"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-12">
+                                        <div class="form-group">
+                                            <label for="balance-amount"
+                                                >Balance Amount</label
+                                            >
+                                            <input
+                                                type="number"
+                                                class="form-control"
+                                                id="balance-amount"
+                                                placeholder="Balance Amount"
+                                                step="0.01"
+                                                min="0"
+                                                disabled
+                                                v-model="balance_amount"
                                                 required
                                             />
                                         </div>
@@ -480,6 +574,24 @@ onMounted(() => {});
                                                             cash_receipt_number
                                                         "
                                                         required
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-12 col-12">
+                                                <div class="form-group">
+                                                    <label
+                                                        for="comment"
+                                                        >Comment</label
+                                                    >
+                                                    <textarea
+                                                        type="text"
+                                                        class="form-control"
+                                                        id="comment"
+                                                        placeholder="Comment"
+                                                        v-model="comment"
+                                                        
                                                     />
                                                 </div>
                                             </div>

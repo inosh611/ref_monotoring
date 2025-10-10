@@ -30,5 +30,6 @@
     "Task": true,
     "Chat": true,
     "MyVisiting": true,
-    "MyCollections": true
+    "MyCollections": true,
+    "StockOdit": true
 }

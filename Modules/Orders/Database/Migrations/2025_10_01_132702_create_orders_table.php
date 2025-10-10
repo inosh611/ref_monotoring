@@ -20,6 +20,7 @@ class CreateOrdersTable extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('order_status')->default('pending');
             $table->string('payment_status')->default('unpaid');
+            $table->string('paid_amount')->default(0);
             $table->unsignedDecimal('total_price', 12, 2);
             $table->timestamps();
         });

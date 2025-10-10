@@ -7,7 +7,7 @@ import { useToast } from 'vue-toastification'
 import axios from 'axios';
 
 const toast = useToast();
-const emit = defineEmits(['edit-item', 'change-price']);
+const emit = defineEmits(['edit-item', 'change-price', 'change-order-status']);
 const props = defineProps<{
     title: string,
     fetch_url: string,
@@ -26,6 +26,8 @@ const props = defineProps<{
     use_view_button?: boolean;
     use_new_price_button?: boolean;
     price_modal_id?: string;
+    use_order_status_button?: boolean;
+    order_status_modal?: string;
 
 }>();
 const products = ref([]);
@@ -137,6 +139,11 @@ const deleteProduct = () => {
     }
 };
 
+const changeOrderStatus = (row: any) => {
+    console.log("Change price row:", props.order_status_modal);
+    $(props.order_status_modal).modal('show');
+    emit('change-order-status', row);
+};
 // New function for handling the general row action
 const handleRowAction = (row: any) => {
     if (props.row_action_route_name) {
@@ -188,6 +195,7 @@ defineExpose({
 
             <template #[`actions`]="slotProps">
                 <div class="btn-group" role="group">
+                    <button class="btn btn-sm btn-primary mr-2" @click="changeOrderStatus(slotProps.value)" v-if="props.use_order_status_button">status</button>
                     <button class="btn btn-sm btn-success mr-2" @click="changePrice(slotProps.value)" v-if="props.use_new_price_button">Price</button>
                     <button class="btn btn-sm btn-primary mr-2" @click="viewProduct(slotProps.value)" v-if="props.use_view_button">View</button>
                     <button class="btn btn-sm btn-warning mr-2" @click="editProduct(slotProps.value)">Edit</button>

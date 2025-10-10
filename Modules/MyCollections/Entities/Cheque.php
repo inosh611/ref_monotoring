@@ -11,6 +11,7 @@ class Cheque extends Model
 
     protected $fillable = [
         'id',
+        'payment_id',
         'cheque_number',
         'bank',
         'branch',
@@ -21,6 +22,10 @@ class Cheque extends Model
         'receipt_number'
     ];
     
+    public function payment()
+    {
+        return $this->belongsTo(Payment::class);
+    }
     protected static function newFactory()
     {
         return \Modules\MyCollections\Database\factories\ChequeFactory::new();

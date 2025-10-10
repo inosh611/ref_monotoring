@@ -178,4 +178,10 @@ class DealersController extends Controller
     {
         //
     }
+
+    public function search(Request $request)
+    {
+        $searchKey = $request->search;
+        return $this->dealerRepository->search($searchKey);
+    }
 }

@@ -15,6 +15,7 @@ class CreateChequesTable extends Migration
     {
         Schema::create('cheques', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('payment_id')->constrained('payments')->onDelete('cascade');
             $table->string('cheque_number');
             $table->string('bank');
             $table->string('branch');

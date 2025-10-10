@@ -7,47 +7,26 @@ import { onMounted, ref } from "vue";
 const customer_table_columns = [
     { field: "row_num", title: "#", isUnique: true, width: "30px" },
     // { field: "id", title: "ID", isUnique: true },
-    { field: "order_number", title: "Order Number" },
-    { field: "business_name", title: "Shop Name" },
-     { field: "user.id", title: "Ref" },
+    { field: "order.order_number", title: "Order Number" },
+    { field: "user.id", title: "Ref" },
+    { field: "collection_type", title: "Collection Type" },
+    { field: "paid_amount", title: "Paid Amount" },
+    { field: "paid_amount_text", title: "Paid Amount Text" },
     {
-        field: "order_status",
-        title: "Order Status",
-        cellRenderer: (row) => {
-            const map = {
-                Pending: "badge badge-warning",
-                processing: "badge badge-info",
-                shipped: "badge badge-primary",
-                completed: "badge badge-success",
-                cancelled: "badge badge-danger",
-            };
-            return `<span class="${
-                map[row.order_status] || "badge badge-secondary"
-            }">
-                ${row.order_status}
-              </span>`;
-        },
-    },
-    {
-        field: "Payment_status",
-        title: "Payment Status",
-        cellRenderer: (row) => {
-            const map = {
-                Pending: "badge badge-danger",
-                unpaid: "badge badge-danger",
-                partial: "badge badge-warning",
-                paid: "badge badge-success",
-                refunded: "badge badge-secondary",
-            };
-            return `<span class="${
-                map[row.payment_status] || "badge badge-light"
-            }">
-                ${row.payment_status}
-              </span>`;
-        },
-    },
-    { field: "total_price", title: "Total_price" },
-    { field: "created_at_formatted", title: "Created At" },
+  field: "comment",
+  title: "Comment",
+  width: 260,                     // important for ellipsis
+  tooltip: (cell) => cell.getValue() ?? "", // Tabulator tooltip (optional)
+  formatter: (cell) => {
+    const val = cell.getValue?.() ?? "";
+    const el = document.createElement("span");
+    el.className = "truncate";
+    el.textContent = val;   // shows preview "...", full text in title/tooltip
+    el.title = val;         // native browser tooltip
+    return el;
+  },
+},
+    { field: "date", title: "Created At" },
     { field: "actions", title: "Actions", cellRenderer: false, width: "50px" },
 ];
 
@@ -102,7 +81,7 @@ onMounted(() => {});
                             <div class="card-body" style="padding: 0px">
                                 <DataTable
                                     title="ORDER TABLE"
-                                    fetch_url="/admin/order/data-table"
+                                    fetch_url="/admin/my-collection/data-table"
                                     :columns="customer_table_columns"
                                     table_icon='<i class="nav-icon fas fa-archive" style="font-size: medium;"></i>'
                                     modal_title="Order"
@@ -119,8 +98,26 @@ onMounted(() => {});
     </AdminLayout>
 </template>
 
-<style scoped>
+<style >
 canvas {
     height: 400px !important;
+}
+
+.truncate{
+  display:inline-block;
+  max-width:100%;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  cursor:help;
+}
+
+/* two-line clamp */
+.clamp-2{
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient: vertical;
+  overflow:hidden;
+  cursor:help;
 }
 </style>

@@ -18,7 +18,8 @@ class Order extends Model
         'user_id',
         'order_status',
         'payment_status',
-        'total_price'
+        'total_price',
+        'paid_amount',
     ];
 
     public function items()

@@ -25,5 +25,6 @@ Route::middleware(['web','auth'])->prefix('admin/dealer')->group(function() {
     Route::post('/delete',[DealersController::class, 'destroy'])->name('dealer.delete');
     Route::get('/show/{id}',[DealersController::class, 'show'])->name('dealer.show');
     Route::get('/all',[DealersController::class, 'all'])->name('dealer.all');
+      Route::get('search', [DealersController::class, 'search'])->name('dealer.search');
 
 });
