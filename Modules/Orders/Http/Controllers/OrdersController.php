@@ -64,6 +64,7 @@ class OrdersController extends Controller
     {
 
         $validated = $request->validated();
+    
         try {
             DB::beginTransaction();
             $orderDetails = [
@@ -72,6 +73,10 @@ class OrdersController extends Controller
                 'order_status' => $validated['order_status'],
                 'payment_status' => $validated['payment_status'],
                 'total_price' => $validated['total_price'],
+                'expected_order_date'=> $validated['expected_order_date'],
+                'expected_collection_date' => $validated['expected_collection_date'],
+                'expected_order_date_comment' => $request->expected_order_date_comment,
+                'expected_collection_date_comment' => $request->expected_collection_date_comment
             ];
             $order = $this->orderRepository->create($orderDetails);
             $itemList = $validated['item_list'];
@@ -191,12 +196,15 @@ class OrdersController extends Controller
         }
     }
 
-    public function search(Request $request)
+    public function searchOrder(Request $request)
     {
-
+   
         $search = (string) $request->query('search', '');
-        $shopId = (int) $request->query('shop_id', 0);
-        $results = $this->orderRepository->search($search, $shopId);
+        $dealerId = (string) $request->query('dealer_id', '');
+        $results = $this->orderRepository->orderFind($search,  $dealerId);
+        
         return response()->json(['results' => $results]);
     }
+
+    
 }

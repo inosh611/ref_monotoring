@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use Modules\Dealers\Http\Controllers\DealersController;
+use Modules\Dealers\Http\Controllers\DealerStockController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,6 +26,11 @@ Route::middleware(['web','auth'])->prefix('admin/dealer')->group(function() {
     Route::post('/delete',[DealersController::class, 'destroy'])->name('dealer.delete');
     Route::get('/show/{id}',[DealersController::class, 'show'])->name('dealer.show');
     Route::get('/all',[DealersController::class, 'all'])->name('dealer.all');
-      Route::get('search', [DealersController::class, 'search'])->name('dealer.search');
+    Route::get('search', [DealersController::class, 'search'])->name('dealer.search');
+
+});
+Route::middleware(['web','auth'])->prefix('admin/dealer-stock')->group(function() {
+    Route::get('search', [DealerStockController::class, 'search'])->name('dealer.stock.search');
+    Route::post('/update', [DealerStockController::class, 'update'])->name('dealer.stock.update');
 
 });

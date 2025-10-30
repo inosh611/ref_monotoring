@@ -60,15 +60,10 @@ class OrderRepository implements OrderRepositoryInterface
         return $query->get();
     }
 
-    public function search($orderKey, $shopId)
+    public function orderFind($orderKey,  $dealerId)
     {
-         return $this->model->newQuery()
-        ->when($shopId, fn ($q) => $q->where('shop_id', $shopId))
-        ->when($orderKey, function ($q) use ($orderKey) {
-            $q->where('order_number', 'like', '%' . $orderKey . '%');
-        })
-        ->with(['items'])
-        ->latest()   // newest first
-        ->get();
+        
+        return $this->model->where('order_number', 'like', '%' . $orderKey . '%')->where('shop_id', $dealerId)->get();
     }
+    
 }

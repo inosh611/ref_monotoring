@@ -26,6 +26,10 @@ const selected_product_price = ref([]);
 const show_product_price = ref("");
 const totalPrice = ref(0);
 const order_number = ref("");
+const expected_order_date = ref("");
+const expected_order_date_comment = ref("");
+const expected_collection_date_comment = ref("");
+const expected_collection_date = ref("");
 
 const props = defineProps({
     dealers: {
@@ -52,7 +56,7 @@ const addItemToList = () => {
         form.classList.add("was-validated");
         return;
     }
-    
+
     const product = selectedProduct?.value;
     const priceObj = selected_product_price?.value;
     const qty = Number(itemQuantity.value);
@@ -109,7 +113,10 @@ const submitOrder = () => {
         formData.append("order_status", "Pending");
         formData.append("total_price", totalPrice.value);
         formData.append("payment_status", "Pending");
-        
+        formData.append("expected_order_date", expected_order_date.value);
+        formData.append("expected_order_date_comment", expected_order_date_comment.value);
+        formData.append("expected_collection_date", expected_collection_date.value);
+        formData.append("expected_collection_date_comment", expected_collection_date_comment.value);
         store("order.store", formData);
     }
 };
@@ -296,6 +303,90 @@ onMounted(() => {});
                         <div class="card card-default">
                             <div class="card-body">
                                 <h5 class="w-75 mb-3 text-bold text-uppercase">
+                                    Add Expected Dates
+                                </h5>
+                                <div class="row">
+                                    <div class="col-lg-6 col-12">
+                                        <div class="form-group">
+                                            <label for="order-date" class=""
+                                                >Expected Order Date</label
+                                            >
+                                            <input
+                                                type="date"
+                                                class="form-control"
+                                                id="order-date"
+                                                v-model="expected_order_date"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-12">
+                                        <div class="form-group">
+                                            <label for="order-date-comment"
+                                                >Expected Order Date Comment</label
+                                            >
+                                                <textarea
+                                                    type="text"
+                                                    class="form-control"
+                                                    id="order-date-comment"
+                                                    v-model="
+                                                        expected_order_date_comment
+                                                    "
+                                                  
+                                                />
+                                        </div>
+                                    </div>
+                                     <div class="col-lg-6 col-12">
+                                        <div class="form-group">
+                                            <label for="collection-date" class=""
+                                                >Expected Collection Date</label
+                                            >
+                                            <input
+                                                type="date"
+                                                class="form-control"
+                                                id="collection-date"
+                                                v-model="expected_collection_date"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-12">
+                                        <div class="form-group">
+                                            <label for="collection-date-comment"
+                                                >Collection Collection Date Comment</label
+                                            >
+                                                <textarea
+                                                    type="text"
+                                                    class="form-control"
+                                                    id="collection-date-comment"
+                                                    v-model="expected_collection_date_comment"
+                                                    
+                                                />
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- <div class="row justify-content-end">
+                                    <div
+                                        class="col-lg-4 col-12 d-flex align-items-end justify-content-end mt-3"
+                                    >
+                                        <button
+                                            type="submit"
+                                            class="btn btn-primary item-add-btn"
+                                            :disabled="
+                                                !itemName || !itemQuantity
+                                            "
+                                        >
+                                            Add Item
+                                        </button>
+                                    </div>
+                                </div> -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="card card-default">
+                            <div class="card-body">
+                                <h5 class="w-75 mb-3 text-bold text-uppercase">
                                     Add Item to order
                                 </h5>
                                 <div class="row">
@@ -372,7 +463,7 @@ onMounted(() => {});
                                     </div>
                                 </div>
                                 <div class="row justify-content-end">
-                                      <div
+                                    <div
                                         class="col-lg-4 col-12 d-flex align-items-end justify-content-end mt-3"
                                     >
                                         <button
@@ -487,15 +578,19 @@ onMounted(() => {});
                                             </table>
                                         </div>
                                     </div>
-                                    <div class="row d-flex justify-content-end" v-if="itemList.length">
+                                    <div
+                                        class="row d-flex justify-content-end"
+                                        v-if="itemList.length"
+                                    >
                                         <div class="col-lg-4 col-12">
                                             <table class="table table-bordered">
                                                 <tbody>
                                                     <tr>
                                                         <td>TOTAL (LKR)</td>
-                                                        <td>{{ totalPrice }}</td>
+                                                        <td>
+                                                            {{ totalPrice }}
+                                                        </td>
                                                     </tr>
-                                                    
                                                 </tbody>
                                             </table>
                                         </div>

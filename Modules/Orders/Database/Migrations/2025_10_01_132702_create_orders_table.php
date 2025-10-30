@@ -21,6 +21,10 @@ class CreateOrdersTable extends Migration
             $table->string('order_status')->default('pending');
             $table->string('payment_status')->default('unpaid');
             $table->string('paid_amount')->default(0);
+            $table->date('expected_order_date');
+            $table->text('expected_order_date_comment')->nullable();
+            $table->date('expected_collection_date');
+            $table->text('expected_collection_date_comment')->nullable();
             $table->unsignedDecimal('total_price', 12, 2);
             $table->timestamps();
         });

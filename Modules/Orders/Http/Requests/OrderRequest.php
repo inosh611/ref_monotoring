@@ -22,7 +22,8 @@ class OrderRequest extends FormRequest
             'order_status'=> ['required','string','max:255'],
             'payment_status'=> ['required','string','max:255'],
             'total_price' => ['required','numeric'],
-
+            'expected_order_date'=>['required'],
+            'expected_collection_date'=>['required'],
             'item_list' => ['required', 'array'],
             'item_list.*.product_id' => ['required','integer'],
             'item_list.*.name' => ['required','string','max:255'],

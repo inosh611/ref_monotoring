@@ -20,6 +20,10 @@ class Order extends Model
         'payment_status',
         'total_price',
         'paid_amount',
+        'expected_order_date',
+        'expected_order_date_comment',
+        'expected_collection_date',
+        'expected_collection_date_comment'
     ];
 
     public function items()

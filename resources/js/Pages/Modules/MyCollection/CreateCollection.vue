@@ -27,6 +27,7 @@ const total_order_amount = ref(0.00);
 const paid_amount = ref(0.00);
 const balance_amount = ref(0.00);
 const comment = ref("");
+const orderDetails = [];
 
 const toWords = new ToWords({
     localeCode: "en-GB",

@@ -11,6 +11,6 @@ interface OrderRepositoryInterface{
     public function delete($id);
     public function allData();
     public function orderCount();
-     public function search($orderKey,  $shopId);
+    public function orderFind($orderKey,  $dealerId);
 }
 ?>
