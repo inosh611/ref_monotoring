@@ -26,6 +26,8 @@ class CreateShopsTable extends Migration
                 ->references('id')
                 ->on('owners')
                 ->onDelete('cascade');
+            $table->text('lat');
+            $table->text('lng');
             $table->timestamps();
         });
     }

@@ -196,7 +196,7 @@ defineExpose({
             <template #[`actions`]="slotProps">
                 <div class="btn-group" role="group">
                     <button class="btn btn-sm btn-primary mr-2" @click="changeOrderStatus(slotProps.value)" v-if="props.use_order_status_button">status</button>
-                    <button class="btn btn-sm btn-success mr-2" @click="changePrice(slotProps.value)" v-if="props.use_new_price_button">Price</button>
+                    <button class="btn btn-sm btn-success mr-2" @click="changePrice(slotProps.value)" v-if="props.use_new_price_button">Change Price</button>
                     <button class="btn btn-sm btn-primary mr-2" @click="viewProduct(slotProps.value)" v-if="props.use_view_button">View</button>
                     <button class="btn btn-sm btn-warning mr-2" @click="editProduct(slotProps.value)">Edit</button>
                     <button class="btn btn-sm btn-danger mr-2"

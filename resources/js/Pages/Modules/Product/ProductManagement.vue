@@ -447,6 +447,7 @@ const close = () => {
                                     placeholder="Current Price"
                                     required
                                     v-model="currentPrice"
+                                    disabled
                                 />
                             </div>
                             <div class="form-group">

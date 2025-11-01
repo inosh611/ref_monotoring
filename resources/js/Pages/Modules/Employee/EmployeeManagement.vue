@@ -45,8 +45,8 @@ onMounted(() => {
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-12">
-                        <a href=""><button class="btn btn-primary mr-2">Export Employee</button></a>
-                        <button class="btn btn-primary mr-2">Import Employee</button>
+                        <!-- <a href=""><button class="btn btn-primary mr-2">Export Employee</button></a>
+                        <button class="btn btn-primary mr-2">Import Employee</button> -->
                         <a :href="route('employee.create')"><button class="btn btn-primary mr-2">Create Employee</button></a>
                     </div>
                 </div>

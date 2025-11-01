@@ -57,6 +57,7 @@ class DealersController extends Controller
     {
 
         $validated = $request->validated();
+        
         try {
             DB::beginTransaction();
             $nicCopyPath = null;
@@ -109,6 +110,8 @@ class DealersController extends Controller
                 'registration_doc' => $validated['registration_doc'],
                 'sign_application' => $validated['sign_application'],
                 'photo_of_the_shop' => $validated['photo_of_the_shop'],
+                'lat' => $validated['lat'],
+                'lng' => $validated['lng']
             ];
             $dealer  = $this->dealerRepository->create($dealerDetails);
 
@@ -119,6 +122,7 @@ class DealersController extends Controller
                 'redirect' => route('dealer.index')
             ]);
         } catch (\Exception $error) {
+            dd($error);
             DB::rollBack();
             if (!empty($nicCopyPath)) {
                 Storage::disk('public')->delete($nicCopyPath);

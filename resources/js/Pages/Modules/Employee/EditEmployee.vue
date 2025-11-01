@@ -90,9 +90,7 @@ async function handleSubmit() {
                         <div class="card card-default">
                             <div class="card-body">
                                 <h5 class="w-75 mb-3 text-bold">Employee Edit</h5>
-                                {{ props.role }} <br>
-                                {{ props.user }}<br>
-                                {{ props.roles }}
+                             
                                 <form class="needs-validation" novalidate @submit.prevent="handleSubmit" ref="formRef">
                                     <div class="form-row">
                                         <div class="col-md-6 mb-3">

@@ -17,7 +17,9 @@ class Shop extends Model
         'sign_application',
         'photo_of_the_shop',
         'owner_id',
-        'business_name'
+        'business_name',
+        'lat',
+        'lng'
     ];
 
     public function owner()

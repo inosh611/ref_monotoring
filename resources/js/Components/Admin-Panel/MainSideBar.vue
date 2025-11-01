@@ -41,7 +41,7 @@
                             <p>Dashboard</p>
                         </a>
                     </li>
-                    <li class="nav-item">
+                    <!-- <li class="nav-item">
                         <a :href="route('task.index')" class="nav-link">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -61,7 +61,7 @@
                             </svg>
                             <p>Task</p>
                         </a>
-                    </li>
+                    </li> -->
                     <li class="nav-item">
                         <a :href="route('product.index')" class="nav-link">
                             <svg
@@ -113,7 +113,7 @@
                             <p>Orders</p>
                         </a>
                     </li>
-                    <li class="nav-item">
+                    <!-- <li class="nav-item">
                         <a :href="route('customer.index')" class="nav-link">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -129,7 +129,7 @@
                             </svg>
                             <p>Customers</p>
                         </a>
-                    </li>
+                    </li> -->
                     <li class="nav-item">
                         <a :href="route('dealer.index')" class="nav-link">
                             <svg
