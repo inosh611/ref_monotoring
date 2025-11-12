@@ -24,6 +24,7 @@
         "bootstrap": "^4.6.2",
         "chart.js": "^4.4.9",
         "jquery": "^3.7.1",
+        "leaflet": "^1.9.4",
         "popper.js": "^1.16.1",
         "to-words": "^4.7.0",
         "vue-toastification": "^2.0.0-rc.5"

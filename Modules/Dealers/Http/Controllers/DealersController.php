@@ -159,7 +159,10 @@ class DealersController extends Controller
 
     public function edit($id)
     {
-        return view('dealers::edit');
+       $dealerDetails = $this->dealerRepository->find($id);
+         return Inertia::render('Modules/Dealers/EditDealer',[
+            'dealerDetails' => $dealerDetails
+        ]);
     }
 
     /**
@@ -168,9 +171,87 @@ class DealersController extends Controller
      * @param int $id
      * @return Renderable
      */
-    public function update(Request $request, $id)
+   public function update(Request $request)
+{
+    // Expecting dealer_id and (optionally) the current_* hidden inputs
+    $dealerId = $request->input('dealer_id');
+    if (!$dealerId) {
+        return response()->json(['error' => true, 'message' => 'dealer_id is required'], 422);
+    }
+
+    // Current stored paths sent from the frontend (or empty "")
+    $currentNicCopy         = $request->input('current_nic_copy');           // OWNER
+    $currentRegistrationDoc = $request->input('current_registration_doc');   // DEALER
+    $currentSignApplication = $request->input('current_sign_application');   // DEALER
+    $currentPhotoOfShop     = $request->input('current_photo_of_the_shop');  // DEALER
+
+    // Fetch existing
+    $dealer = $this->dealerRepository->find($dealerId);
+    if (!$dealer) {
+        return response()->json(['error' => true, 'message' => 'Dealer not found'], 404);
+    }
+
+    DB::beginTransaction();
+    try {
+        // ---- files ----
+        $nicCopyPath = $this->storeOrKeep($request, 'nic_copy', 'nic_copy', $currentNicCopy);
+
+        $registrationDocPath = $this->storeOrKeep($request, 'registration_doc', 'registration_doc', $currentRegistrationDoc);
+        $signApplicationPath = $this->storeOrKeep($request, 'sign_application', 'sign_application', $currentSignApplication);
+        $photoOfShopPath     = $this->storeOrKeep($request, 'photo_of_the_shop', 'photo_of_the_shop', $currentPhotoOfShop);
+
+        // ---- payloads (use provided input if set; otherwise keep existing) ----
+        $ownerData = [
+            'first_name'     => $request->input('first_name',     $dealer->owner->first_name),
+            'last_name'      => $request->input('last_name',      $dealer->owner->last_name),
+            'nic'            => $request->input('nic',            $dealer->owner->nic),
+            'contact_number' => $request->input('contact_number', $dealer->owner->contact_number),
+            'address'        => $request->input('address',        $dealer->owner->address),
+            'email'          => $request->input('email',          $dealer->owner->email),
+            'owner_position' => $request->input('owner_position', $dealer->owner->owner_position),
+            'nic_copy'       => $nicCopyPath,
+        ];
+
+        $dealerData = [
+            'business_name'     => $request->input('business_name',    $dealer->business_name),
+            'business_address'  => $request->input('business_address', $dealer->business_address),
+            'business_tel'      => $request->input('business_tel',     $dealer->business_tel),
+            'registration_doc'  => $registrationDocPath,
+            'sign_application'  => $signApplicationPath,
+            'photo_of_the_shop' => $photoOfShopPath,
+            'lat'               => $request->input('lat', $dealer->lat),
+            'lng'               => $request->input('lng', $dealer->lng),
+        ];
+
+        // ---- persist ----
+        $this->ownerRepository->update($dealer->owner_id, $ownerData);
+        $this->dealerRepository->update($dealer->id, $dealerData);
+
+        DB::commit();
+
+        return response()->json([
+            'success'  => true,
+            'message'  => 'Dealer successfully updated.',
+            'redirect' => route('dealer.index'),
+        ]);
+    } catch (\Throwable $e) {
+        DB::rollBack();
+        return response()->json(['error' => true, 'message' => $e->getMessage()], 500);
+    }
+}
+
+     private function storeOrKeep(Request $request, string $key, string $dir, ?string $currentPath): ?string
     {
-        //
+        if ($request->hasFile($key)) {
+            $newPath = $request->file($key)->store($dir, 'public');
+            if ($currentPath && Storage::disk('public')->exists($currentPath)) {
+                Storage::disk('public')->delete($currentPath);
+            }
+            return $newPath;
+        }
+
+        // front-end may send empty "" when not changed — just keep current
+        return $currentPath;
     }
 
     /**

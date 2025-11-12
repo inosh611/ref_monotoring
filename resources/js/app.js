@@ -5,6 +5,9 @@ import "bootstrap";
 import "popper.js";
 import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
+// resources/js/app.js (or main.js)
+import 'leaflet/dist/leaflet.css';
+
 // import 'jquery';
 
 import "admin-lte";

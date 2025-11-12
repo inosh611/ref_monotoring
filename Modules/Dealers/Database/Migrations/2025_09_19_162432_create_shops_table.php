@@ -22,10 +22,7 @@ class CreateShopsTable extends Migration
             $table->text('sign_application');
             $table->text('photo_of_the_shop');
             $table->unsignedBigInteger('owner_id');
-            $table->foreign('owner_id')
-                ->references('id')
-                ->on('owners')
-                ->onDelete('cascade');
+            $table->foreign('owner_id')->references('id')->on('owners')->onDelete('cascade');
             $table->text('lat');
             $table->text('lng');
             $table->timestamps();

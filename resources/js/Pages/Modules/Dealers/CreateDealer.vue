@@ -1,7 +1,7 @@
 <script setup>
 import AdminLayout from "@/Layouts/Admin/AdminLayout.vue";
 import { Head } from "@inertiajs/vue3";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { useToast } from "vue-toastification";
 import { store } from "../../../main";
 import DataTable from "@/Components/Admin/DataTable.vue";
@@ -17,32 +17,17 @@ const owner_position = ref("");
 const business_name = ref("");
 const business_address = ref("");
 const business_tel = ref("");
-const location_code = ref("");
+const lat_code = ref("");
+const lng_code = ref("");
+const location_type = ref("");
 
-const lng = ref('');
-const lat = ref('');
+const lng = ref("");
+const lat = ref("");
 const formRef = ref(null);
 
 const props = defineProps({
     roles: Array,
 });
-
-function extractLatLng() {
-    console.log("calling");
-    const embedCode = location_code.value;
-    const regex = /!2d([-0-9.]+)!3d([-0-9.]+)/;
-    const match = embedCode.match(regex);
-
-    if (match) {
-        lng.value = match[1];
-        lat.value = match[2];
-        console.log("Location codes ", lng, " ", lat);
-        // document.getElementById("latitude").value = lat;
-        // document.getElementById("longitude").value = lng;
-    } else {
-        alert("No valid Google Map coordinates found!");
-    }
-}
 
 async function handleSubmit() {
     const form = formRef.value;
@@ -81,6 +66,61 @@ async function handleSubmit() {
 
     store("dealer.store", formData);
 }
+
+watch(
+    () => location_type.value,
+    async (newValue) => {
+        if (newValue === "current") {
+            if (!("geolocation" in navigator)) {
+                toast.error("Geolocation is not supported by this browser.");
+                return;
+            }
+
+            // (Optional) check permission state for clearer errors
+            try {
+                if (navigator.permissions?.query) {
+                    const status = await navigator.permissions.query({
+                        name: "geolocation",
+                    });
+                    if (status.state === "denied") {
+                        toast.error(
+                            "Location permission denied in browser settings."
+                        );
+                        return;
+                    }
+                }
+            } catch {
+                /* ignore permissions API errors */
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    lat.value = position.coords.latitude;
+                    lng.value = position.coords.longitude;
+                    console.log("Current location selected");
+                    console.log("lat:", lat.value, "lng:", lng.value);
+                },
+                (error) => {
+                    toast.error(
+                        "Error getting current location: " + error.message
+                    );
+                    console.error(error);
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0,
+                }
+            );
+        } else {
+            lat.value = lat_code.value;
+            lng.value = lng_code.value;
+            console.log("Manual location selected");
+            console.log("lat:", lat.value, "lng:", lng.value);
+        }
+    },
+    { immediate: true } // run once on component mount, optional
+);
 </script>
 
 <template>
@@ -280,19 +320,56 @@ async function handleSubmit() {
                                                 v-model="business_tel"
                                             />
                                         </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label for="business_location"
-                                                >Business Location</label
-                                            >
-                                            <input
-                                                type="text"
-                                                class="form-control"
-                                                id="business_location"
-                                                required
-                                                placeholder="Location of the Business"
-                                                v-model="location_code"
-                                                @change="extractLatLng"
-                                            />
+                                        <div class="col-md-6" :class="location_type == 'current' ?? 'mb-3'">
+                                            <div class="form-group">
+                                                <label
+                                                    for="exampleFormControlSelect1"
+                                                    >Location Type</label
+                                                >
+                                                <select
+                                                    class="form-control"
+                                                    id="exampleFormControlSelect1"
+                                                    v-model="location_type"
+                                                >
+                                                    <option value="current">
+                                                        Current Location
+                                                    </option>
+                                                    <option value="custom">
+                                                        Custom Location
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div
+                                            class="col-12 d-flex custom-location"
+                                            v-if="location_type == 'custom'"
+                                        >
+                                         <div class="col-md-6 pl-0 mb-3">
+                                                <label for="lat-code"
+                                                    >Lat Code</label
+                                                >
+                                                <input
+                                                    type="text"
+                                                    class="form-control"
+                                                    id="lat-code"
+                                                    required
+                                                    placeholder="Lat Code"
+                                                    v-model="lat"
+                                                />
+                                            </div>
+                                            <div class="col-md-6 pl-0 mb-3">
+                                                <label for="lat-code"
+                                                    >Lng Code</label
+                                                >
+                                                <input
+                                                    type="text"
+                                                    class="form-control"
+                                                    id="lng-code"
+                                                    required
+                                                    placeholder="Lng Code"
+                                                    v-model="lng"
+                                                />
+                                            </div>
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <label for="registration_doc"
@@ -320,7 +397,7 @@ async function handleSubmit() {
                                                 required
                                             />
                                         </div>
-                                        
+
                                         <div class="col-md-6 mb-3">
                                             <label for="photo_of_the_shop"
                                                 >Photo of the shop</label
@@ -333,7 +410,6 @@ async function handleSubmit() {
                                                 required
                                             />
                                         </div>
-                                        
                                     </div>
                                     <div class="row">
                                         <div
@@ -357,11 +433,17 @@ async function handleSubmit() {
                     <div class="col-12">
                         <div class="card card-default">
                             <div class="card-body" style="padding: 0px">
-                                <!-- <DataTable title="DEALERS TABLE" fetch_url=""
-                                    :columns="dealer_table_columns"
-                                    table_icon='<i class="nav-icon fas fa-archive" style="font-size: medium;"></i>'
-                                    modal_title="Dealers" edit_route_name='dealer.edit'
-                                    delete_route_name='dealer.delete' view_button=false /> -->
+                                <div class="w-full" style="height: 360px">
+                                    <iframe
+                                        :src="`https://www.google.com/maps?q=${lat},${lng}&z=16&output=embed`"
+                                        width="100%"
+                                        height="100%"
+                                        style="border: 0"
+                                        loading="lazy"
+                                        allowfullscreen
+                                        referrerpolicy="no-referrer-when-downgrade"
+                                    ></iframe>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -374,5 +456,8 @@ async function handleSubmit() {
 <style scoped>
 canvas {
     height: 400px !important;
+}
+.custom-location .col-md-6 {
+   transition: all 1s ease;
 }
 </style>

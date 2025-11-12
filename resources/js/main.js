@@ -30,7 +30,9 @@ export const store = (submit_route, form_data) => {
 
 export const update = (update_route, form_data, section_name) => {
     axios
-        .post(route(update_route), form_data)
+        .post(route(update_route), form_data,  {
+            headers: { "Content-Type": "multipart/form-data" },
+        })
         .then((response) => {
             toast.success(response.data.message);
             setTimeout(() => {
