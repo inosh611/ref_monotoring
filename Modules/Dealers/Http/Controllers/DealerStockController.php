@@ -95,7 +95,7 @@ class DealerStockController extends Controller
      */
     public function destroy($id)
     {
-        //
+    
     }
 
     public function search(Request $request){

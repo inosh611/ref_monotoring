@@ -65,5 +65,11 @@ class OrderRepository implements OrderRepositoryInterface
         
         return $this->model->where('order_number', 'like', '%' . $orderKey . '%')->where('shop_id', $dealerId)->get();
     }
-    
+    public function find($id)
+    {
+        
+       return $this->model->newQuery()
+        ->with(['items.product', 'shop', 'user'])
+        ->findOrFail($id);
+    }
 }

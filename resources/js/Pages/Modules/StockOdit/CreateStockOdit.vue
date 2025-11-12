@@ -75,6 +75,7 @@ const selectOrder = async (order_id) => {
         const { data } = await axios.get(route("dealer.stock.search"), {
             params: { order_id: order_id, dealer_id: dealer_id.value },
         });
+        console.log("Stock Items : ", data);
         stock_items.value = data.results.map(item => ({
             id: item.id,
             order_number: item.order.order_number,

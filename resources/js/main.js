@@ -13,6 +13,7 @@ export const store = (submit_route, form_data) => {
             // toast.success("Product Successfully Created");
             toast.success(response.data.message);
             setTimeout(() => {
+                console.log("Redirecting...", response.data.redirect);
                 window.location.href = response.data.redirect;
             }, 1500);
         })

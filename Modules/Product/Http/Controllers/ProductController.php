@@ -9,6 +9,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\Support\Renderable;
 use Modules\Product\Http\Requests\ProductRequest;
+use Modules\Product\Repositories\Interfaces\ProductPriceRepositoryInterface;
 use Modules\Product\Repositories\Interfaces\UnitRepositoryInterface;
 use Modules\Product\Repositories\Interfaces\ProductRepositoryInterface;
 use Modules\Product\Repositories\ProductPriceRepository;
@@ -23,7 +24,7 @@ class ProductController extends Controller
     protected $productRepository;
     protected $productPriceRepository;
 
-    public function __construct(UnitRepositoryInterface $unitRepository, ProductRepositoryInterface $productRepository, ProductRepositoryInterface $productPriceRepository){
+    public function __construct(UnitRepositoryInterface $unitRepository, ProductRepositoryInterface $productRepository, ProductPriceRepositoryInterface $productPriceRepository){
             $this->unitRepository = $unitRepository;
             $this->productRepository = $productRepository;
             $this->productPriceRepository = $productPriceRepository;
@@ -62,6 +63,7 @@ class ProductController extends Controller
         try {
              DB::beginTransaction();
              $product = $this->productRepository->create($validated);
+             
              if($product){
                 $priceData = [
                     'product_id' => $product->id,
@@ -77,6 +79,7 @@ class ProductController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Failed to update unit: ' . $e->getMessage());
+            dd($e->getMessage());
             return redirect()->back()->with('error', 'Failed to update unit: ' . $e->getMessage())->withInput();
         }
     }

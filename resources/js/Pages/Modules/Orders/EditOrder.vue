@@ -4,7 +4,7 @@ import DataTable from "@/Components/Admin/DataTable.vue";
 import { Head } from "@inertiajs/vue3";
 import { onMounted, ref, watch, nextTick } from "vue";
 import { useToast } from "vue-toastification";
-import { store, searchData } from "../../../main";
+import { update, searchData } from "../../../main";
 import $ from "jquery";
 
 const toast = useToast();
@@ -44,10 +44,30 @@ const props = defineProps({
         type: Number,
         required: true,
     },
+    orderDetails: {
+        type: Object,
+        required: true,
+    },
 });
 
 user_details.value = props.user.first_name + " " + props.user.last_name;
-
+dealer_id.value = props.orderDetails.shop.id;
+expected_order_date.value = props.orderDetails.expected_order_date ?? "";
+expected_order_date_comment.value = props.orderDetails.expected_order_date_comment ?? "";
+expected_collection_date.value = props.orderDetails.expected_collection_date ?? "";
+expected_collection_date_comment.value = props.orderDetails.expected_collection_date_comment ?? ""; 
+itemList.value = props.orderDetails.items.map((it) => ({
+    product_id: it.product_id,
+    name: it.product.product_name ?? it.product.name ?? "",
+    quantity: it.quantity,
+    price_id: it.price_id,
+    price: Number(it.price),
+    sub_total: Number(it.quantity) * Number(it.price),
+}));
+totalPrice.value = itemList.value.reduce(
+    (sum, it) => sum + Number(it.sub_total),
+    0
+);
 const addItemToList = () => {
     const form = itemAddFormRef.value;
 
@@ -107,7 +127,9 @@ const submitOrder = () => {
         return;
     } else {
         const formData = new FormData();
+         formData.append("full_update", 'True');
         formData.append("item_list", JSON.stringify(itemList.value));
+         formData.append("order_id", props.orderDetails.id);
         formData.append("shop_id", dealer_id.value);
         formData.append("user_id", props.user.id);
         formData.append("order_status", "Pending");
@@ -117,7 +139,7 @@ const submitOrder = () => {
         formData.append("expected_order_date_comment", expected_order_date_comment.value);
         formData.append("expected_collection_date", expected_collection_date.value);
         formData.append("expected_collection_date_comment", expected_collection_date_comment.value);
-        store("order.store", formData);
+        update("order.update", formData);
     }
 };
 const searchItem = async (val) => {
@@ -173,15 +195,6 @@ const submitPrice = (price_id) => {
     show_product_price.value = chosen.price;
     console.log("Selected product with price:", chosen);
 };
-
-const deleteItem = (index) => {
-    const item = itemList.value[index];
-    if (item) {
-        totalPrice.value -= item.sub_total;
-        itemList.value.splice(index, 1);
-    }
-};
-
 document.addEventListener("click", (event) => {
     if (searchWrapRef.value && !searchWrapRef.value.contains(event.target)) {
         closeResults();
@@ -237,8 +250,9 @@ onMounted(() => {});
                                 <a :href="route('dashboard')">Dashboard</a>
                             </li>
                             <li class="breadcrumb-item active">
-                                Order Management
+                                    {{ props.orderDetails.order_number }}
                             </li>
+                            
                         </ol>
                     </div>
                 </div>
@@ -280,6 +294,7 @@ onMounted(() => {});
                                                 <option
                                                     v-for="dealer in dealers"
                                                     :value="dealer.id"
+                                                   
                                                 >
                                                     {{ dealer.business_name }} -
                                                     {{
@@ -567,8 +582,9 @@ onMounted(() => {});
                                                                 fill="#EA3323"
                                                                 class="table-trash-icon"
                                                                 @click="
-                                                                    deleteItem(
-                                                                        index
+                                                                    itemList.splice(
+                                                                        index,
+                                                                        1
                                                                     )
                                                                 "
                                                             >
