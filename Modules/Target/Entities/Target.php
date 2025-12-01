@@ -17,6 +17,7 @@ class Target extends Model
         'month',
         'year',
         'target_value',
+        'achieved_value'
     ];
     
     public function user()

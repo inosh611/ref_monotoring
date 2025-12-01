@@ -6,6 +6,7 @@ use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Contracts\Support\Renderable;
+use Modules\Target\Http\Requests\Target;
 use Modules\Target\Repositories\Interfaces\TargetRepositoryInterface;
 
 class TargetController extends Controller
@@ -31,6 +32,11 @@ class TargetController extends Controller
      * Show the form for creating a new resource.
      * @return Renderable
      */
+    public function dataTable(Request $request)
+    {
+        return $this->targetRepository->dataTable($request);
+    }
+
     public function create()
     {
         return Inertia::render('Modules/Target/CreateTarget');
@@ -45,9 +51,9 @@ class TargetController extends Controller
     {
         if (! $this->checkUserByEmployeeRegNo($request->employee_registration_number)) {
             return response()->json([
-            'success' => false,
-            'message' => 'Employee Registration Number Not Found'
-        ], 422); 
+                'success' => false,
+                'message' => 'Employee Registration Number Not Found'
+            ], 422);
         } else {
             $targetData = [
                 'employee_reg_no' => $request->employee_registration_number,
@@ -67,12 +73,11 @@ class TargetController extends Controller
                 return redirect()->back()->with('error', 'An error occurred while creating the target: ' . $e->getMessage());
             };
         }
-
     }
     private function checkUserByEmployeeRegNo($employee_registration_number)
-        {
-            return \App\Models\User::where('reg_number', $employee_registration_number)->exists();
-        }
+    {
+        return \App\Models\User::where('reg_number', $employee_registration_number)->exists();
+    }
 
     /**
      * Show the specified resource.
@@ -91,7 +96,14 @@ class TargetController extends Controller
      */
     public function edit($id)
     {
-        return view('target::edit');
+        try {
+            $target = $this->targetRepository->find($id);
+            return Inertia::render("Modules/Target/targetEdit", [
+                'target' => $target,
+            ]);
+        } catch (\Exception $error) {
+            Log::error('Customer Find Failed: ' . $error->getMessage());
+        }
     }
 
     /**
@@ -100,9 +112,32 @@ class TargetController extends Controller
      * @param int $id
      * @return Renderable
      */
-    public function update(Request $request, $id)
+    public function update(Target $request)
     {
-        //
+        if (! $this->checkUserByEmployeeRegNo($request->employee_reg_no)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Employee Registration Number Not Found'
+            ], 422);
+        } else {
+            $validated = $request->validated();
+            $user_id = findUserId($request->employee_reg_no);
+            $validated['user_id'] = $user_id;
+            try {
+                $target = $this->targetRepository->update($validated['id'], $validated);
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Target Successfully Updated.',
+                    'redirect' => route('target.index')
+                ]);
+            } catch (\Exception $error) {
+                Log::error('Customer Update Failed: ' . $error->getMessage());
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Update failed. Please try again.'
+                ], 500);
+            }
+        }
     }
 
     /**
@@ -110,8 +145,22 @@ class TargetController extends Controller
      * @param int $id
      * @return Renderable
      */
-    public function destroy($id)
+     public function destroy(Request $request)
     {
-        //
+        try{
+             $target = $this->targetRepository->delete($request->id);
+             if($target){
+                 return response()->json([
+                'success' => true,
+                'message' => 'Target Successfully Deleted.',
+                 ]);
+             }
+        }catch(\Exception $error){
+             Log::error('Target Delete Failed: ' . $error->getMessage());
+              return response()->json([
+                    'success' => false,
+                    'message' => 'Delete failed. Please try again.'
+                ], 500);
+        };
     }
 }

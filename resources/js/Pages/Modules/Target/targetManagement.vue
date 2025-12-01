@@ -6,45 +6,18 @@ import { onMounted, ref } from "vue";
 // Define product table columns
 const dealer_table_columns = [
     { field: "id", title: "ID", isUnique: true },
-    { field: "owner.first_name", title: "Owner Name" },
-    { field: "owner.contact_number", title: "Owner Contact number" },
-    { field: "business_name", title: "Business Name" },
-    { field: "business_address", title: "Business Address" },
+    { field: "employee_reg_no", title: "Employee Reg Number" },
+    { field: "year", title: "Year" },
+    { field: "month", title: "Month" },
+    { field: "target_value", title: "Target Value" },
+    { field: "achieved_value", title: "Achieved Value" },
     {
-        field: "nic_copy",
-        title: "NIC Copy",
+        field: "achieved_value",
+        title: "Status",
         cellRenderer: (row) =>
-            row.owner.nic_copy
-                ? `<a href="/storage/${row.owner.nic_copy}" target="_blank" rel="noopener"
-           onclick="event.stopPropagation();">NIC Copy</a>`
-                : "N/A",
-    },
-    {
-        field: "registration_doc",
-        title: "Registration Doc",
-        cellRenderer: (row) =>
-            row.registration_doc
-                ? `<a href="/storage/${row.registration_doc}" target="_blank" rel="noopener"
-           onclick="event.stopPropagation();">View PDF</a>`
-                : "N/A",
-    },
-    {
-        field: "sign_application",
-        title: "Sign Application",
-        cellRenderer: (row) =>
-            row.sign_application
-                ? `<a href="/storage/${row.sign_application}" target="_blank" rel="noopener"
-           onclick="event.stopPropagation();">View PDF</a>`
-                : "N/A",
-    },
-    {
-        field: "photo_of_the_shop",
-        title: "Photo of The Shop",
-        cellRenderer: (row) =>
-            row.sign_application
-                ? `<a href="/storage/${row.sign_application}" target="_blank" rel="noopener"
-           onclick="event.stopPropagation();">View PDF</a>`
-                : "N/A",
+            row.achieved_value == row.target_value
+                ? `<span class="badge badge-success">Achieved</span>`
+                : `<span class="badge badge-danger">Not Achieved</span>`,
     },
     { field: "actions", title: "Actions", cellRenderer: false, width: "50px" },
 ];
@@ -59,7 +32,7 @@ onMounted(() => {});
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h4 class="m-0">TARGET</h4>
+                        <h4 class="m-0">EMPLOYEE TARGET</h4>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
@@ -67,7 +40,7 @@ onMounted(() => {});
                                 <a :href="route('dashboard')">Dashboard</a>
                             </li>
                             <li class="breadcrumb-item active">
-                                Dealers Management
+                                Employee Target
                             </li>
                         </ol>
                     </div>
@@ -92,15 +65,14 @@ onMounted(() => {});
                         <div class="card card-default">
                             <div class="card-body" style="padding: 0px">
                                 <DataTable
-                                    title="DEALERS TABLE"
+                                    title="TARGET TABLE"
                                     fetch_url="/admin/target/data-table"
                                     :columns="dealer_table_columns"
                                     table_icon='<i class="nav-icon fas fa-archive" style="font-size: medium;"></i>'
                                     modal_title="Dealers"
-                                    edit_route_name="dealer.edit"
-                                    delete_route_name="dealer.delete"
-                                    use_view_button="true"
-                                    view_route_name="dealer.show"
+                                    edit_route_name="target.edit"
+                                    delete_route_name="target.delete"
+                                    :use_view_button="false"
                                 />
                             </div>
                         </div>
