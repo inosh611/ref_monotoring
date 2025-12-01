@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->string('reg_number')->unique()->default('REG-0000');
             $table->string('first_name');
             $table->string('last_name');
             $table->string('nic');

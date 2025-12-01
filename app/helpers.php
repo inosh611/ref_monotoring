@@ -9,5 +9,11 @@ if (! function_exists('findOrderId')) {
     }
 }
 
+if (!function_exists('findUserId')){
+    function findUserId($reg_number) {
+        $user = \App\Models\User::where('reg_number', $reg_number)->first();
+        return $user ? $user->id : null;
+    }
+}
 
 ?>

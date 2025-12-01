@@ -31,5 +31,6 @@
     "Chat": true,
     "MyVisiting": true,
     "MyCollections": true,
-    "StockOdit": true
+    "StockOdit": true,
+    "Target": true
 }
