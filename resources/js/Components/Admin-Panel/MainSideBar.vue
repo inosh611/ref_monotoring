@@ -55,7 +55,7 @@
                     </li>
                     <li class="nav-item">
                         <a
-                            :href="route('employee_dashboard')"
+                            :href="route('employee.dashboard')"
                             class="nav-link nav-link-modern active"
                         >
                             <span class="nav-icon-wrapper">

@@ -5,6 +5,7 @@ namespace Modules\MyCollections\Repositories;
 use Carbon\Carbon;
 use App\Traits\ApiCrudTrait;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Modules\MyCollections\Entities\Payment;
 use Modules\MyCollections\Repositories\Interfaces\PaymentRepositoryInterface;
 
@@ -72,5 +73,12 @@ class PaymentRepository implements PaymentRepositoryInterface
         }
 
         return $query->get();
+    }
+
+    public function todayTotalCollections()
+    {
+        $today = Carbon::now()->startOfDay();
+        $totalCollections = $this->model->where('created_at', '>=', $today)->where('user_id', Auth::user()->id)->sum('paid_amount');
+        return $totalCollections;
     }
 }

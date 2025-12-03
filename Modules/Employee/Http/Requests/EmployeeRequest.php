@@ -23,6 +23,7 @@ class EmployeeRequest extends FormRequest
 
         return [
             'id'=> ['nullable','integer'],
+            'reg_number'=> ['required','string','max:255'],
             'first_name'=> ['required','string','max:255'],
             'last_name'=> ['required','string','max:255'],
             'nic'=> ['required','string','max:255'],

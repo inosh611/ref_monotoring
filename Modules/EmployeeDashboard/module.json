@@ -1,0 +1,13 @@
+{
+    "name": "EmployeeDashboard",
+    "alias": "employeedashboard",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\EmployeeDashboard\\Providers\\EmployeeDashboardServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

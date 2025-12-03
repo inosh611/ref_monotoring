@@ -6,6 +6,7 @@ use App\Traits\ApiCrudTrait;
 use Illuminate\Http\Request;
 
 use Modules\Orders\Entities\Order;
+use Illuminate\Support\Facades\Auth;
 use Modules\Orders\Repositories\Interfaces\OrderRepositoryInterface;
 
 class OrderRepository implements OrderRepositoryInterface
@@ -18,7 +19,8 @@ class OrderRepository implements OrderRepositoryInterface
     {
         $this->model = $dealer;
     }
-    public function orderCount(){
+    public function orderCount()
+    {
         $count = $this->model->count();
         return $count;
     }
@@ -44,9 +46,9 @@ class OrderRepository implements OrderRepositoryInterface
             $rows = collect($results->items())->values()->map(function ($row, $i) use ($start) {
                 $row->row_num = ($start ?? 0) + $i; // 1,2,3... per page'
                 if ($row->created_at) {
-                $row->created_at_formatted = \Carbon\Carbon::parse($row->created_at)->format('Y-M-d g.i a');
-                $row->business_name = $row->shop ? $row->shop->business_name : null;
-    }
+                    $row->created_at_formatted = \Carbon\Carbon::parse($row->created_at)->format('Y-M-d g.i a');
+                    $row->business_name = $row->shop ? $row->shop->business_name : null;
+                }
                 return $row;
             });
             return [
@@ -62,14 +64,26 @@ class OrderRepository implements OrderRepositoryInterface
 
     public function orderFind($orderKey,  $dealerId)
     {
-        
+
         return $this->model->where('order_number', 'like', '%' . $orderKey . '%')->where('shop_id', $dealerId)->get();
     }
     public function find($id)
     {
-        
-       return $this->model->newQuery()
-        ->with(['items.product', 'shop', 'user'])
-        ->findOrFail($id);
+
+        return $this->model->newQuery()
+            ->with(['items.product', 'shop', 'user'])
+            ->findOrFail($id);
+    }
+
+    public function todayExpectedOrders()
+    {
+        $today = now()->toDateString();
+
+        return $this->model
+            ->where('user_id', Auth::user()->id)
+            ->where('order_status', 'Confirmed')
+            ->whereDate('expected_order_date', '<', $today)
+            ->with(['items.product', 'shop', 'user'])
+            ->get();
     }
 }

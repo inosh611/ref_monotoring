@@ -175,10 +175,26 @@ class OrdersController extends Controller
                     ]);
                 } catch (\Exception $e) {
                     DB::rollBack();
-                    dd($e);
+                   
                     return response()->json([
                         'error' => true,
                         'message' => 'Order Creation Failed. Error: ' . $e->getMessage(),
+                        'redirect' => route('order.index')
+                    ], 500);
+                }
+            }
+            elseif ($orderStatus != "Delivered") {
+                try {
+                    $this->orderRepository->update($request->order_id, $request->only(['order_status']));
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Order Successfully Updated.',
+                        'redirect' => route('order.index')
+                    ]);
+                } catch (\Exception $e) {
+                    return response()->json([
+                        'error' => true,
+                        'message' => 'Order Update Failed. Error: ' . $e->getMessage(),
                         'redirect' => route('order.index')
                     ], 500);
                 }
@@ -289,6 +305,7 @@ class OrdersController extends Controller
                     'success' => true,
                     'message' => 'Order updated',
                     'total'   => $order->total_price,
+                    'redirect' => route('order.index')
                 ]);
             } catch (\Throwable $e) {
                 DB::rollBack();

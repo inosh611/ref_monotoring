@@ -16,7 +16,7 @@ const employee_email = ref('');
 const role_name = ref('');
 const employee_position = ref('');
 const formRef = ref(null);
-
+const reg_no = ref("")
 const props = defineProps({
     roles: Array,
 });
@@ -51,6 +51,7 @@ async function handleSubmit() {
     formData.append('email', employee_email.value);
     formData.append('position', employee_position.value);
     formData.append('roll_name', role_name.value);
+    formData.append('reg_number', reg_no.value);
 
     store('employee.store', formData);
 }
@@ -90,6 +91,11 @@ async function handleSubmit() {
                                 <h5 class="w-75 mb-3 text-bold">Employee Details</h5>
                                 <form class="needs-validation" novalidate @submit.prevent="handleSubmit" ref="formRef">
                                     <div class="form-row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="reg_no">Registration Number</label>
+                                            <input type="text" class="form-control" id="reg_no" required
+                                                placeholder="Reg No" v-model="reg_no">
+                                        </div>
                                         <div class="col-md-6 mb-3">
                                             <label for="employee_first_name">First Name</label>
                                             <input type="text" class="form-control" id="employee_first_name" required

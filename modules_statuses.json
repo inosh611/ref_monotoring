@@ -32,5 +32,6 @@
     "MyVisiting": true,
     "MyCollections": true,
     "StockOdit": true,
-    "Target": true
+    "Target": true,
+    "EmployeeDashboard": true
 }

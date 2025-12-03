@@ -11,8 +11,19 @@ const dealer_id = ref("");
 
 const props = defineProps({
     roles: Array,
-    dealers: Array,
+    myVisiting: Array,
 });
+
+function formatToAmPm(timeString) {
+    if (!timeString) return null;
+
+    const [hour, minute] = timeString.split(":");
+    let h = parseInt(hour);
+    const ampm = h >= 12 ? "PM" : "AM";
+    h = h % 12 || 12;
+
+    return `${h}:${minute} ${ampm}`;
+}
 
 const resetForm = () => {
     dealer_id.value = "";
@@ -22,47 +33,55 @@ const resetForm = () => {
 // Define product table columns\,
 const dealer_table_columns = [
     { field: "id", title: "ID", isUnique: true },
-    { field: "owner.first_name", title: "Owner Name" },
-    { field: "owner.contact_number", title: "Owner Contact number" },
-    { field: "business_name", title: "Business Name" },
-    { field: "business_address", title: "Business Address" },
-    {
-        field: "nic_copy",
-        title: "NIC Copy",
+    { field: "dealer", title: "Owner Name",
+        cellRenderer: (row) => row.dealer.business_name  +" - "+ row.dealer.business_address,
+     }, 
+    { field: "time", title: "Check In Time",
         cellRenderer: (row) =>
-            row.owner.nic_copy
-                ? `<a href="/storage/${row.owner.nic_copy}" target="_blank" rel="noopener"
-           onclick="event.stopPropagation();">NIC Copy</a>`
-                : "N/A",
+            row.time
+                ? `<span class="badge badge-success p-2">
+                    ${formatToAmPm(row.time)}</span>`
+                : `<span class="badge badge-danger p-2">
+                    Not yet</span>`, 
+
+    },
+    { field: "date", title: "Check In Date",
+        cellRenderer: (row) =>
+            row.date
+                ? `<span class="badge badge-success p-2">
+                    ${row.date}</span>`
+                : `<span class="badge badge-danger p-2">
+                    Not yet</span>`,
+     },
+     {
+        field: "checkout_time",
+        title: "Checkout Time",
+        cellRenderer: (row) =>
+            row.checkout_time
+                ? `<span class="badge badge-success p-2">
+                    ${formatToAmPm(row.checkout_time)}</span>`
+                : `<span class="badge badge-danger p-2">
+                    Not yet</span>`,
     },
     {
-        field: "registration_doc",
-        title: "Registration Doc",
+        field: "checkout_date",
+        title: "Checkout Date",
         cellRenderer: (row) =>
-            row.registration_doc
-                ? `<a href="/storage/${row.registration_doc}" target="_blank" rel="noopener"
-           onclick="event.stopPropagation();">View PDF</a>`
-                : "N/A",
+            row.checkout_time
+                ? `<span class="badge badge-success p-2">
+                    ${formatToAmPm(row.checkout_date)}</span>`
+                : `<span class="badge badge-danger p-2">
+                    Not yet</span>`,
     },
     {
-        field: "sign_application",
-        title: "Sign Application",
-        cellRenderer: (row) =>
-            row.sign_application
-                ? `<a href="/storage/${row.sign_application}" target="_blank" rel="noopener"
-           onclick="event.stopPropagation();">View PDF</a>`
-                : "N/A",
-    },
-    {
-        field: "photo_of_the_shop",
+        field: "dealer.photo_of_the_shop",
         title: "Photo of The Shop",
         cellRenderer: (row) =>
-            row.sign_application
-                ? `<a href="/storage/${row.sign_application}" target="_blank" rel="noopener"
-           onclick="event.stopPropagation();">View PDF</a>`
+            row.dealer.photo_of_the_shop
+                ? `<a href="/storage/${row.dealer.photo_of_the_shop}" target="_blank" rel="noopener"
+           onclick="event.stopPropagation();">View Image</a>`
                 : "N/A",
     },
-    { field: "actions", title: "Actions", cellRenderer: false, width: "50px" },
 ];
 
 function getCurrentTime() {
@@ -137,16 +156,6 @@ onMounted(() => {});
                                 Submit Check In
                             </button></a
                         >
-                        <a :href="route('dealer.create')"
-                            ><button class="btn btn-primary mr-2">
-                                Submit Stock
-                            </button></a
-                        >
-                        <a :href="route('dealer.create')"
-                            ><button class="btn btn-primary mr-2">
-                                Submit Collection
-                            </button></a
-                        >
                         <button
                             class="btn btn-primary mr-2"
                             type="button"
@@ -164,13 +173,13 @@ onMounted(() => {});
                             <div class="card-body" style="padding: 0px">
                                 <DataTable
                                     title="DEALERS TABLE"
-                                    fetch_url="/admin/dealer/data-table"
+                                    fetch_url="/admin/my-visiting/data-table"
                                     :columns="dealer_table_columns"
                                     table_icon='<i class="nav-icon fas fa-archive" style="font-size: medium;"></i>'
-                                    modal_title="Dealers"
+                                    modal_title="My Visiting Details"
                                     edit_route_name="dealer.edit"
                                     delete_route_name="dealer.delete"
-                                    use_view_button="true"
+                                    :use_view_button="false"
                                     view_route_name="dealer.show"
                                 />
                             </div>

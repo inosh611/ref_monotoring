@@ -30,11 +30,17 @@ class MyVisitingController extends Controller
         $this->myVisitingRepository = $myVisitingRepository;
     }
 
+
+    public function dataTable(Request $request) // Remove When start Backend
+    {
+        return ($this->myVisitingRepository->dataTable($request));
+    }
+
     public function index()
     {
-         $dealers = $this->dealerRepository->allData();
+         $myVisiting = $this->myVisitingRepository->allData();
 
-        return Inertia::render('Modules/MyVisiting/VisitingManagement', ['dealers' => $dealers]);
+        return Inertia::render('Modules/MyVisiting/VisitingManagement', ['myVisiting' => $myVisiting]);
     }
 
     public function checkIn()
@@ -67,7 +73,13 @@ class MyVisitingController extends Controller
                 $validated['photo_of_shop'] = $request->file('photo_of_the_shop')->store('my_visiting_shop', 'public');
             }
              $submit = $this->myVisitingRepository->create($validated);
-            dd($submit);
+            if ($submit) {
+                 return response()->json([
+                'success' => true,
+                'message' => 'Your Visiting Successfully Updated.',
+                'redirect' => route('submit.index')
+                 ]);
+            } 
         } catch (\Exception $error) {
             dd($error->getMessage());
             return response()->json(['error' => true, 'message' => $error->getMessage()]);

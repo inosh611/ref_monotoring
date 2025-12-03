@@ -59,7 +59,7 @@ class EmployeeController extends Controller
     public function store(EmployeeRequest $request)
     {
         $validated = $request->validated();
-        $password = Hash::make($validated['email']);
+        $password = Hash::make($validated['nic']);
         $payload = [
             'first_name' => $validated['first_name'],
             'last_name' => $validated['last_name'],
@@ -69,10 +69,22 @@ class EmployeeController extends Controller
             'position' => $validated['position'],
             'email' => $validated['email'],
             'password' => $password,
+            'reg_number' => $validated['reg_number'],
         ];
-        $user =  $this->employeeRepository->create($payload);
-        if ($user) {
-            $user->assignRole($validated['roll_name']);
+        try {
+            $user =  $this->employeeRepository->create($payload);
+            if ($user) {
+                $user->assignRole($validated['roll_name']);
+            }
+            if($user){
+                 return response()->json([
+                'success' => true,
+                'message' => 'Employee Successfully Created.',
+                'redirect' => route('employee.index')
+                 ]);
+             }
+        } catch (\Exception $error) {
+            Log::error('Customer Creation Failed: ' . $error->getMessage());
         }
     }
 
@@ -93,19 +105,18 @@ class EmployeeController extends Controller
      */
     public function edit($id)
     {
-        
 
-        try{
+
+        try {
             $user = $this->employeeRepository->find($id);
-             return Inertia::render("Modules/Employee/EditEmployee", [
-            'user' => $user,
-            'role' => $user->getRoleNames()->first(),   
-            'roles' => Role::select('id', 'name')->get()
-        ]);
-        }catch(\Exception $error){
+            return Inertia::render("Modules/Employee/EditEmployee", [
+                'user' => $user,
+                'role' => $user->getRoleNames()->first(),
+                'roles' => Role::select('id', 'name')->get()
+            ]);
+        } catch (\Exception $error) {
             Log::error('Customer Find Failed: ' . $error->getMessage());
         }
-       
     }
 
     /**
@@ -117,18 +128,18 @@ class EmployeeController extends Controller
     public function update(EmployeeRequest $request)
     {
         $validated = $request->validated();
-        
-        try{
+
+        try {
             $user = $this->employeeRepository->update($validated['id'], $validated);
             $user->syncRoles([$validated['roll_name']]);
             return response()->json([
                 'success' => true,
                 'message' => 'Employee Successfully Updated.',
-                'redirect' => route('employee.index')]);
-        }catch(\Exception $error){
-             Log::error('Customer Update Failed: ' . $error->getMessage());
+                'redirect' => route('employee.index')
+            ]);
+        } catch (\Exception $error) {
+            Log::error('Customer Update Failed: ' . $error->getMessage());
         }
-        
     }
 
     /**
@@ -138,16 +149,16 @@ class EmployeeController extends Controller
      */
     public function destroy(Request $request)
     {
-        try{
-             $user = $this->employeeRepository->delete($request->id);
-             if($user){
-                 return response()->json([
-                'success' => true,
-                'message' => 'Employee Successfully Deleted.',
-                 ]);
-             }
-        }catch(\Exception $error){
-             Log::error('Customer Update Failed: ' . $error->getMessage());
+        try {
+            $user = $this->employeeRepository->delete($request->id);
+            if ($user) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Employee Successfully Deleted.',
+                ]);
+            }
+        } catch (\Exception $error) {
+            Log::error('Customer Update Failed: ' . $error->getMessage());
         };
     }
 }

@@ -6,6 +6,7 @@ import { onMounted, ref } from 'vue';
 // Define product table columns
 const employee_table_columns = [
     { field: 'id', title: 'ID', isUnique: true },
+    { field: 'reg_number', title: 'Reg Number' },
     { field: 'first_name', title: 'First Name' },
     { field: 'last_name', title: 'Last Name' },
     { field: 'position', title: 'Position' },

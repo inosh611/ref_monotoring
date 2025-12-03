@@ -11,5 +11,6 @@ interface MyVisitingRepositoryInterface{
     public function delete($id);
     public function allData();
     public function updateCheckOut($user_id, $dealer_id, array $data);
+    public function getTodayVisiting($user_id);
 }
 ?>

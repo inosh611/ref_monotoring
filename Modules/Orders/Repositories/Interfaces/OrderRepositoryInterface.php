@@ -12,5 +12,6 @@ interface OrderRepositoryInterface{
     public function allData();
     public function orderCount();
     public function orderFind($orderKey,  $dealerId);
+    public function todayExpectedOrders();
 }
 ?>

@@ -19,17 +19,17 @@ const customer_table_columns = [
     // { field: "id", title: "ID", isUnique: true },
     { field: "order_number", title: "Order Number" },
     { field: "business_name", title: "Shop Name" },
-    { field: "user.id", title: "Ref" },
+    { field: "user.reg_number", title: "Ref" },
     {
         field: "order_status",
         title: "Order Status",
         cellRenderer: (row) => {
             const map = {
-                Pending: "badge badge-warning",
-                processing: "badge badge-info",
-                shipped: "badge badge-primary",
-                completed: "badge badge-success",
-                cancelled: "badge badge-danger",
+                Pending: "badge badge-warning p-2",
+                Delivered: "badge badge-info p-2",
+                Confirmed: "badge badge-success p-2",
+                completed: "badge badge-success p-2",
+                cancelled: "badge badge-danger p-2",
             };
             return `<span class="${
                 map[row.order_status] || "badge badge-secondary"
@@ -43,11 +43,11 @@ const customer_table_columns = [
         title: "Payment Status",
         cellRenderer: (row) => {
             const map = {
-                Pending: "badge badge-danger",
-                unpaid: "badge badge-danger",
-                partial: "badge badge-warning",
-                paid: "badge badge-success",
-                refunded: "badge badge-secondary",
+                Pending: "badge badge-danger p-2",
+                unpaid: "badge badge-danger p-2",
+                partial: "badge badge-warning p-2",
+                paid: "badge badge-success p-2",
+                refunded: "badge badge-secondary p-2",
             };
             return `<span class="${
                 map[row.payment_status] || "badge badge-light"
@@ -58,6 +58,7 @@ const customer_table_columns = [
     },
     { field: "total_price", title: "Total_price" },
     { field: "created_at_formatted", title: "Created At" },
+    { field: "expected_order_date", title: "Expected Order Date" },
     { field: "actions", title: "Actions", cellRenderer: false, width: "50px" },
 ];
 
@@ -188,7 +189,6 @@ onMounted(() => {});
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <pre>{{ orderItems }}</pre>
                      <form
                             class="needs-validation"
                             novalidate
