@@ -2,7 +2,10 @@
     <!-- Main Sidebar Container -->
     <aside class="main-sidebar sidebar-dark-primary elevation-4 sidebar-modern">
         <!-- Brand Logo -->
-        <a :href="route('admin.dashboard.login')" class="brand-link brand-link-modern">
+        <a
+            :href="route('admin.dashboard.login')"
+            class="brand-link brand-link-modern"
+        >
             <div class="brand-logo-wrapper">
                 <img
                     src="/images/Admin-panel/panel-logo - 2.png"
@@ -12,7 +15,7 @@
             </div>
             <div class="brand-text-wrapper">
                 <span class="brand-text-main">ARG PVT LTD</span>
-                <span class="brand-text-sub">Sales Force Admin</span>
+                <span class="brand-text-sub">Sales Force {{ userRole }}</span>
             </div>
         </a>
 
@@ -29,10 +32,11 @@
                     <!-- MAIN NAVIGATION -->
                     <li class="nav-header nav-header-modern">MAIN</li>
 
-                    <li class="nav-item">
+                    <li class="nav-item" v-if="userRole == 'Super Admin'">
                         <a
                             :href="route('admin.dashboard.login')"
-                            class="nav-link nav-link-modern active"
+                            class="nav-link nav-link-modern"
+                            :class="{ active: isActive('admin.dashboard.login') }"
                         >
                             <span class="nav-icon-wrapper">
                                 <svg
@@ -53,10 +57,11 @@
                             </p>
                         </a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item" v-if="userRole != 'Super Admin'">
                         <a
                             :href="route('employee.dashboard')"
                             class="nav-link nav-link-modern active"
+                            :class="{ active: isActive('employee.dashboard') }"
                         >
                             <span class="nav-icon-wrapper">
                                 <svg
@@ -79,10 +84,16 @@
                     </li>
 
                     <!-- SALES / OPERATIONS -->
-                    <li class="nav-header nav-header-modern mt-2">SALES & OPERATIONS</li>
+                    <li class="nav-header nav-header-modern mt-2">
+                        SALES & OPERATIONS
+                    </li>
 
-                    <li class="nav-item">
-                        <a :href="route('product.index')" class="nav-link nav-link-modern">
+                    <li class="nav-item" v-if="can('product.management')">
+                        <a
+                            :href="route('product.index')"
+                            class="nav-link nav-link-modern"
+                            :class="{ active: isActive('product.index') }"
+                        >
                             <span class="nav-icon-wrapper">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -100,8 +111,12 @@
                         </a>
                     </li>
 
-                    <li class="nav-item">
-                        <a :href="route('unit.index')" class="nav-link nav-link-modern">
+                    <li class="nav-item" v-if="can('product.management')">
+                        <a
+                            :href="route('unit.index')"
+                            class="nav-link nav-link-modern"
+                            :class="{ active: isActive('unit.index') }"
+                        >
                             <span class="nav-icon-wrapper">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -119,8 +134,12 @@
                         </a>
                     </li>
 
-                    <li class="nav-item">
-                        <a :href="route('order.index')" class="nav-link nav-link-modern">
+                    <li class="nav-item" v-if="can('order.management')">
+                        <a
+                            :href="route('order.index')"
+                            class="nav-link nav-link-modern"
+                            :class="{ active: isActive('order.index') }"
+                        >
                             <span class="nav-icon-wrapper">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -141,8 +160,12 @@
                         </a>
                     </li>
 
-                    <li class="nav-item">
-                        <a :href="route('dealer.index')" class="nav-link nav-link-modern">
+                    <li class="nav-item" v-if="can('dealer.management')">
+                        <a
+                            :href="route('dealer.index')"
+                            class="nav-link nav-link-modern"
+                            :class="{ active: isActive('dealer.index') }"
+                        >
                             <span class="nav-icon-wrapper">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -161,7 +184,11 @@
                     </li>
 
                     <li class="nav-item">
-                        <a :href="route('chat.index')" class="nav-link nav-link-modern">
+                        <a
+                            :href="route('chat.index')"
+                            class="nav-link nav-link-modern"
+                            :class="{ active: isActive('chat.index') }"
+                        >
                             <span class="nav-icon-wrapper">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -191,10 +218,19 @@
                     </li>
 
                     <!-- EMPLOYEE & TARGETS -->
-                    <li class="nav-header nav-header-modern mt-2">EMPLOYEES & TARGETS</li>
+                    <li
+                        class="nav-header nav-header-modern mt-2"
+                        v-if="can('employee.management')"
+                    >
+                        EMPLOYEES & TARGETS
+                    </li>
 
-                    <li class="nav-item">
-                        <a :href="route('employee.index')" class="nav-link nav-link-modern">
+                    <li class="nav-item" v-if="can('employee.management')">
+                        <a
+                            :href="route('employee.index')"
+                            class="nav-link nav-link-modern"
+                            :class="{ active: isActive('employee.index') }"
+                        >
                             <span class="nav-icon-wrapper">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -212,8 +248,12 @@
                         </a>
                     </li>
 
-                    <li class="nav-item">
-                        <a :href="route('target.index')" class="nav-link nav-link-modern">
+                    <li class="nav-item" v-if="can('employee.management')">
+                        <a
+                            :href="route('target.index')"
+                            class="nav-link nav-link-modern"
+                            :class="{ active: isActive('target.index') }"
+                        >
                             <span class="nav-icon-wrapper">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -232,10 +272,16 @@
                     </li>
 
                     <!-- REPORTS & MY STUFF -->
-                    <li class="nav-header nav-header-modern mt-2">REPORTS & MY ACTIVITY</li>
+                    <li class="nav-header nav-header-modern mt-2">
+                        REPORTS & MY ACTIVITY
+                    </li>
 
-                    <li class="nav-item">
-                        <a :href="route('reports')" class="nav-link nav-link-modern">
+                    <li class="nav-item" v-if="can('report.management')">
+                        <a
+                            :href="route('reports')"
+                            class="nav-link nav-link-modern"
+                            :class="{ active: isActive('reports') }"
+                        >
                             <span class="nav-icon-wrapper">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -254,7 +300,11 @@
                     </li>
 
                     <li class="nav-item">
-                        <a :href="route('submit.index')" class="nav-link nav-link-modern">
+                        <a
+                            :href="route('submit.index')"
+                            class="nav-link nav-link-modern"
+                            :class="{ active: isActive('submit.index') }"
+                        >
                             <span class="nav-icon-wrapper">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -273,7 +323,11 @@
                     </li>
 
                     <li class="nav-item">
-                        <a :href="route('my.collection.index')" class="nav-link nav-link-modern">
+                        <a
+                            :href="route('my.collection.index')"
+                            class="nav-link nav-link-modern"
+                            :class="{ active: isActive('my.collection.index') }"
+                        >
                             <span class="nav-icon-wrapper">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -292,7 +346,11 @@
                     </li>
 
                     <li class="nav-item">
-                        <a :href="route('stock.odit.create')" class="nav-link nav-link-modern">
+                        <a
+                            :href="route('stock.odit.create')"
+                            class="nav-link nav-link-modern"
+                            :class="{ active: isActive('stock.odit.create') }"
+                        >
                             <span class="nav-icon-wrapper">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -311,9 +369,17 @@
                     </li>
 
                     <!-- SYSTEM SETTINGS -->
-                    <li class="nav-header nav-header-modern mt-2">SYSTEM & ACCESS</li>
+                    <li
+                        class="nav-header nav-header-modern mt-2"
+                        v-if="userRole == 'Super Admin'"
+                    >
+                        SYSTEM & ACCESS
+                    </li>
 
-                    <li class="nav-item has-treeview">
+                    <li
+                        class="nav-item has-treeview"
+                        v-if="userRole == 'Super Admin'"
+                    >
                         <a href="#" class="nav-link nav-link-modern">
                             <span class="nav-icon-wrapper">
                                 <svg
@@ -330,17 +396,27 @@
                             </span>
                             <p class="nav-text">
                                 Permission
-                                <i class="fas fa-angle-left right nav-arrow"></i>
+                                <i
+                                    class="fas fa-angle-left right nav-arrow"
+                                ></i>
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a :href="route('role.management')" class="nav-link nav-link-sub">
+                                <a
+                                    :href="route('role.management')"
+                                    class="nav-link nav-link-sub"
+                                    :class="{ active: isActive('role.management') }"
+                                >
                                     <p class="ml-4">Role</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a :href="route('admin.permission')" class="nav-link nav-link-sub">
+                                <a
+                                    :href="route('admin.permission')"
+                                    class="nav-link nav-link-sub"
+                                    :class="{ active: isActive('admin.permission') }"
+                                >
                                     <p class="ml-4">Permission</p>
                                 </a>
                             </li>
@@ -348,8 +424,12 @@
                     </li>
 
                     <!-- LOG OUT -->
-                    <li class="nav-item mt-3">
-                        <a :href="route('logout')" method="post" class="nav-link nav-link-modern nav-link-logout">
+                    <li class="nav-item mt-3" style="margin-bottom: 100px">
+                        <a
+                            :href="route('logout')"
+                            method="post"
+                            class="nav-link nav-link-modern nav-link-logout"
+                        >
                             <span class="nav-icon-wrapper">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -382,9 +462,40 @@ export default {
             type: Array,
             required: true,
         },
+        userRoles: {
+            type: Array,
+            required: true,
+        },
     },
-    mounted() {
-        console.log("userPermissions:", this.userPermissions);
+    watch: {
+        userPermissions: {
+            immediate: true,
+            handler(newVal) {
+                console.log("Updated userPermissions:", newVal);
+            },
+        },
+        userRoles: {
+            immediate: true,
+            handler(newVal) {
+                console.log("Updated userRoll:", newVal[0]);
+            },
+        },
+    },
+    computed: {
+        userRole() {
+            return this.userRoles?.[0] ?? "";
+        },
+    },
+    methods: {
+        can(permission) {
+            return this.userPermissions.includes(permission);
+        },
+        canAny(permissions) {
+            return permissions.some((p) => this.userPermissions.includes(p));
+        },
+        isActive(routeName) {
+            return route().current(routeName);
+        },
     },
 };
 </script>
@@ -392,7 +503,12 @@ export default {
 <style>
 /* Overall sidebar look */
 .sidebar-modern {
-    background: radial-gradient(circle at top left, #202b3b 0, #111827 60%, #020617 100%);
+    background: radial-gradient(
+        circle at top left,
+        #202b3b 0,
+        #111827 60%,
+        #020617 100%
+    );
     border-right: 1px solid rgba(148, 163, 184, 0.12);
 }
 

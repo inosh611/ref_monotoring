@@ -358,13 +358,13 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.content-header {
+/* .content-header {
     background: linear-gradient(120deg, #141E30, #243B55);
     color: #fff;
     border-radius: 0 0 1.5rem 1.5rem;
     padding-bottom: 1.5rem;
     margin-bottom: 1rem;
-}
+} */
 
 .content-header h1 {
     font-size: 1.6rem;

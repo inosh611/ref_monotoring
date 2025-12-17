@@ -30,7 +30,7 @@ const hasRole = (role) => {
 <template>
     <div class="wrapper">
         <TopNav />
-        <SideBar :user-permissions="userPermissions"/>
+        <SideBar :userPermissions="userPermissions" :userRoles = "userRoles"/>
         <main>
             <div class="content-wrapper">
                 <!-- Main content -->

@@ -1,10 +1,10 @@
 <?php
 
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\RoleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\RoleController;
-use App\Http\Controllers\PermissionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,10 +21,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::middleware('auth:sanctum')->get('/user-permissions', function (Request $request) {
+Route::middleware(['web','auth'])->get('/user-permissions', function (Request $request) {
     return response()->json([
-        'roles' => Auth::user()->getRoleNames(), // Get user roles
-        'permissions' => Auth::user()->getAllPermissions()->pluck('name') // Get all permissions
+        'roles' => Auth::user()->getRoleNames(),
+        'permissions' => Auth::user()->getAllPermissions()->pluck('name')
     ]);
 });
 

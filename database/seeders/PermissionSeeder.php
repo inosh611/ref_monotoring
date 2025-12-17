@@ -17,7 +17,7 @@ class PermissionSeeder extends Seeder
    
             'user.management',         
             'employee.management',    
-            'rbac.management',         
+            'product.management',         
             'dealer.management',       
             'visit.management',         
             'stock.management',         
