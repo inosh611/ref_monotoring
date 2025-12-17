@@ -26,4 +26,6 @@ Route::prefix('admin/employee')->group(function() {
 });
 Route::prefix('admin/employee')->group(function() {
     Route::get('/edit/{id}',[EmployeeController::class, 'edit'])->name('employee.edit');
+     Route::post('/all',[EmployeeController::class, 'all'])->name('employee.all');
+
 });

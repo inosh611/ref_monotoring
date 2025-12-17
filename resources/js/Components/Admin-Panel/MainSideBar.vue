@@ -278,9 +278,9 @@
 
                     <li class="nav-item" v-if="can('report.management')">
                         <a
-                            :href="route('reports')"
+                            :href="route('reports.index')"
                             class="nav-link nav-link-modern"
-                            :class="{ active: isActive('reports') }"
+                            :class="{ active: isActive('reports.index') }"
                         >
                             <span class="nav-icon-wrapper">
                                 <svg

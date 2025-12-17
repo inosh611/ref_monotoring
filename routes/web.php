@@ -26,7 +26,7 @@ Route::get('/', function () {
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
-});
+})->name('home');
 Route::get('/test', function () {
     return Inertia::render('Modules/Product/Test');
 });
@@ -38,9 +38,9 @@ Route::get('/employee-dashboard', function () {
     return Inertia::render('Modules/AdminDashBoard/EmployeeDashboard');
 })->middleware(['auth', 'verified'])->name('employee_dashboard');
 
-Route::get('/reports', function () {
-    return Inertia::render('Modules/AdminDashBoard/Report');
-})->middleware(['auth', 'verified'])->name('reports');
+// Route::get('/reports', function () {
+//     return Inertia::render('Modules/AdminDashBoard/Report');
+// })->middleware(['auth', 'verified'])->name('reports');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

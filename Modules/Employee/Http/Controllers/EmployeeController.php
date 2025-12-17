@@ -161,4 +161,16 @@ class EmployeeController extends Controller
             Log::error('Customer Update Failed: ' . $error->getMessage());
         };
     }
+
+    public function all()
+    {
+        try {
+            $employees = $this->employeeRepository->allData();
+            return response()->json([
+                'data' => $employees,
+            ]);
+        } catch (\Exception $error) {
+            Log::error('Employee Fetch Failed: ' . $error->getMessage());
+        };
+    }
 }

@@ -156,6 +156,12 @@ class DealersController extends Controller
     public function all(){
         return $this->dealerRepository->allData();
     }
+    public function dealerAll(){
+         $dealers = $this->dealerRepository->allData();
+            return response()->json([
+                'data' => $dealers,
+            ]);
+    }
 
     public function edit($id)
     {

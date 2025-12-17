@@ -19,4 +19,5 @@ Route::prefix('admin/dealer')->group(function () {
     Route::get('/', [DealersController::class, 'index'])->name('dealer.index');
     Route::get('/create', [DealersController::class, 'create'])->name('dealer.create');
     Route::get('/edit/{id}', [DealersController::class, 'edit'])->name('dealer.edit');
+    Route::post('/all', [DealersController::class, 'dealerAll'])->name('dealer.all');
 });

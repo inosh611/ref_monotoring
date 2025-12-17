@@ -15,11 +15,6 @@ class EmployeeRepository implements EmployeeRepositoryInterface{
     {
         $this->model = $employee;
     }
-
-    public function allData()
-    {
-        return $this->model->query();
-    }
     
 }
 ?>
