@@ -1,0 +1,13 @@
+{
+    "name": "ReportGenarateController",
+    "alias": "reportgenaratecontroller",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\ReportGenarateController\\Providers\\ReportGenarateControllerServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

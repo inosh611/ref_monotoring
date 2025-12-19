@@ -1,9 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\Product\Http\Controllers\ProductController;
 use Modules\Product\Http\Controllers\UnitController;
 use Modules\Report\Http\Controllers\ReportController;
+use Modules\Product\Http\Controllers\ProductController;
+use Modules\Report\Http\Controllers\ReportGenarateController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,6 +22,13 @@ Route::prefix('admin/report')->group(function () {
     Route::post('/data-table', [ProductController::class, 'dataTable'])->name('product.datatable');
     Route::get('/', [ReportController::class, 'index'])->name('reports.index');
     Route::post('/visiting', [ReportController::class, 'customerWisedVisitsReport'])->name('visiting.report.filter');
+    Route::post('/order', [ReportController::class, 'orderReport'])->name('order.report.filter');
+
+    //Excel Export Route
+    Route::get('/visiting/export', [ReportGenarateController::class, 'exportCustomerWisedVisits'])
+        ->name('admin.report.visiting.export');
+    Route::get('/order/export', [ReportGenarateController::class, 'exportOrder'])
+        ->name('admin.report.order.export');
 });
 
 

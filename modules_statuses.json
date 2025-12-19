@@ -33,5 +33,7 @@
     "MyCollections": true,
     "StockOdit": true,
     "Target": true,
-    "EmployeeDashboard": true
+    "EmployeeDashboard": true,
+    "Controller": true,
+    "ReportGenarateController": true
 }

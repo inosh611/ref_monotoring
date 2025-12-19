@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\MyVisiting\Entities\MyVisiting;
 use Illuminate\Contracts\Support\Renderable;
+use Modules\Orders\Entities\Order;
 
 class ReportController extends Controller
 {
@@ -17,6 +18,7 @@ class ReportController extends Controller
 
     public function customerWisedVisitsReport(Request $request)
     {
+
         $query = MyVisiting::with(['dealer', 'user']);
 
         if ($request->selected_dealer && $request->selected_dealer !== 'all') {
@@ -24,7 +26,7 @@ class ReportController extends Controller
         }
 
         if ($request->selected_employee && $request->selected_employee !== 'all') {
-            $query->where('user_id', $request->selected_employee);
+            $query->where('ref_id', $request->selected_employee);
         }
 
         if ($request->selected_status === 'visited') {
@@ -83,4 +85,83 @@ class ReportController extends Controller
             'total' => $results->total(),
         ]);
     }
+
+    public function orderReport(Request $request)
+{
+    $query = Order::with(['shop', 'user']); // use relations that exist
+
+    // Shop filter
+    if ($request->selected_shop && $request->selected_shop !== 'all') {
+        $query->where('shop_id', $request->selected_shop);
+    }
+
+    // Employee filter
+    if ($request->selected_employee && $request->selected_employee !== 'all') {
+        $query->where('user_id', $request->selected_employee);
+    }
+
+    // Order status
+    if ($request->selected_order_status && $request->selected_order_status !== 'all') {
+        $query->where('order_status', $request->selected_order_status);
+    }
+
+    // Payment status
+    if ($request->selected_payment_status && $request->selected_payment_status !== 'all') {
+        $query->where('payment_status', $request->selected_payment_status);
+    }
+
+    // Date range (use expected_order_date)
+    if ($request->start_date && $request->end_date) {
+        $query->whereBetween('expected_order_date', [$request->start_date, $request->end_date]);
+    } elseif ($request->start_date) {
+        $query->whereDate('expected_order_date', '>=', $request->start_date);
+    } elseif ($request->end_date) {
+        $query->whereDate('expected_order_date', '<=', $request->end_date);
+    }
+
+    // Search
+    if ($request->search) {
+        $search = $request->search;
+
+        $query->where(function ($q) use ($search) {
+            $q->where('order_number', 'like', "%{$search}%")
+              ->orWhere('total_price', 'like', "%{$search}%")
+              ->orWhere('paid_amount', 'like', "%{$search}%")
+              ->orWhereHas('shop', function ($sq) use ($search) {
+                  $sq->where('business_name', 'like', "%{$search}%")
+                     ->orWhere('business_address', 'like', "%{$search}%")
+                     ->orWhere('business_tel', 'like', "%{$search}%");
+              })
+              ->orWhereHas('user', function ($uq) use ($search) {
+                  $uq->where('reg_number', 'like', "%{$search}%")
+                     ->orWhere('first_name', 'like', "%{$search}%")
+                     ->orWhere('last_name', 'like', "%{$search}%")
+                     ->orWhere('contact_number', 'like', "%{$search}%");
+              });
+        });
+    }
+
+    // Sorting
+    $allowedSortColumns = [
+        'id', 'order_number', 'expected_order_date',
+        'total_price', 'paid_amount', 'order_status', 'payment_status'
+    ];
+
+    $sortColumn = in_array($request->sort_column, $allowedSortColumns)
+        ? $request->sort_column
+        : 'id';
+
+    $sortDirection = $request->sort_direction === 'desc' ? 'desc' : 'asc';
+    $query->orderBy($sortColumn, $sortDirection);
+
+    $perPage = (int) ($request->per_page ?? 10);
+
+    $results = $query->paginate($perPage);
+
+    return response()->json([
+        'data' => $results->items(),
+        'total' => $results->total(),
+    ]);
+}
+
 }

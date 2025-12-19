@@ -6,51 +6,7 @@ import $ from "jquery";
 import { useToast } from "vue-toastification";
 import axios from "axios";
 
-function formatToAmPm(timeString) {
-    if (!timeString) return null;
-
-    const [hour, minute] = timeString.split(":");
-    let h = parseInt(hour);
-    const ampm = h >= 12 ? "PM" : "AM";
-    h = h % 12 || 12;
-
-    return `${h}:${minute} ${ampm}`;
-}
-
 const toast = useToast();
-const table_columns = [
-    { field: "dealer.business_name", title: "Dealer Name", isUnique: true },
-    { field: "dealer.business_address", title: "Address" },
-    { field: "dealer.business_tel", title: "Contact number" },
-    { field: "user.reg_number", title: "Ref Reg No" },
-    { field: "user.first_name", title: "Ref Name" },
-
-    { field: "date", title: "Date" },
-    {
-        field: "time",
-        title: "Check In Time",
-        cellRenderer: (row) => 
-            row.time
-                ? `<span class="badge badge-success p-2">
-                    ${formatToAmPm(row.time)}</span>`
-                : `<span class="badge badge-danger p-2">
-                    Not yet</span>`, 
-        
-    },
-    {
-        field: "checkout_time",
-        title: "Check Out Time",
-        cellRenderer: (row) => 
-            row.check_out_time
-                ? `<span class="badge badge-success p-2">
-                    ${formatToAmPm(row.check_out_time)}</span>`
-                : `<span class="badge badge-danger p-2">
-                    Not yet</span>`, 
-        
-        },
-];
-
-const emit = defineEmits(["edit-item", "change-price", "change-order-status"]);
 const props = defineProps<{
     dealers: Array<any>;
     employees: Array<any>;
@@ -64,14 +20,13 @@ const page = ref(1);
 const perPage = ref(10);
 const search = ref("");
 const loading = ref(false);
-const cols = table_columns;
 const modal_data = ref(<any | null>null);
 const selected_dealer = ref("all");
 const selected_employee = ref("all");
-const selected_status = ref("all");
+const selected_order_status = ref("all");
 const start_date = ref("");
 const end_date = ref("");
-
+const selected_payment_status = ref("all");
 const params = ref({
     sort_column: "id",
     sort_direction: "asc",
@@ -82,6 +37,74 @@ axios.defaults.headers.common["X-CSRF-TOKEN"] =
         .querySelector('meta[name="csrf-token"]')
         ?.getAttribute("content") || "";
 axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
+
+const table_columns = [
+    { field: "order_number", title: "Order Number", isUnique: true },
+
+    { field: "shop.business_name", title: "Shop Name" },
+    { field: "shop.business_address", title: "Shop Address" },
+    { field: "shop.business_tel", title: "Shop Contact" },
+
+    { field: "user.reg_number", title: "Ref Reg" },
+    { field: "user.first_name", title: "Ref Name" },
+
+    { field: "total_price", title: "Total Price" },
+    { field: "paid_amount", title: "Paid Amount" },
+
+    {
+        field: "payment_status",
+        title: "Payment Status",
+        cellRenderer: (row) => {
+            const total = Number(row.total_price ?? 0);
+            const paid = Number(row.paid_amount ?? 0);
+
+            // protect against weird data
+            if (total <= 0) {
+                return `<span class="badge badge-secondary p-2">N/A</span>`;
+            }
+
+            if (paid >= total) {
+                return `<span class="badge badge-success p-2">Paid</span>`;
+            }
+
+            if (paid > 0 && paid < total) {
+                return `<span class="badge badge-info p-2">Partially Paid</span>`;
+            }
+
+            return `<span class="badge badge-warning p-2">Pending</span>`;
+        },
+    },
+    {
+        field: "order_status",
+        title: "Order Status",
+        cellRenderer: (row) => {
+            const status = (row.order_status || "").toLowerCase();
+
+            if (status === "delivered" || status === "delevered") {
+                return `<span class="badge badge-success p-2">Delivered</span>`;
+            }
+
+            if (status === "confirm" || status === "confirmed") {
+                return `<span class="badge badge-info p-2">Confirmed</span>`;
+            }
+
+            // default
+            return `<span class="badge badge-warning p-2">Pending</span>`;
+        },
+    },
+
+    { field: "expected_order_date", title: "Expected Order Date" },
+];
+const cols = table_columns;
+
+function formatToAmPm(timeString) {
+    if (!timeString) return null;
+    const [hour, minute] = timeString.split(":");
+    let h = parseInt(hour);
+    const ampm = h >= 12 ? "PM" : "AM";
+    h = h % 12 || 12;
+    return `${h}:${minute} ${ampm}`;
+}
 
 const handleSortChange = (sortData: {
     sortColumn: string;
@@ -101,7 +124,8 @@ const fetchProducts = async () => {
             search: search.value,
             selected_dealer: selected_dealer.value,
             selected_employee: selected_employee.value,
-            selected_status: selected_status.value,
+            selected_order_status: selected_order_status.value,
+            selected_payment_status: selected_payment_status.value,
             start_date: start_date.value,
             end_date: end_date.value,
             sort_column: params.value.sort_column,
@@ -136,21 +160,20 @@ watch(search, () => {
 const createFilter = () => {
     console.log("Clicking");
     fetchProducts();
-}
-const downloadExcel = () => {
-  const params = new URLSearchParams({
-    selected_dealer: selected_dealer.value,
-    selected_employee: selected_employee.value,
-    selected_status: selected_status.value,
-    start_date: start_date.value ?? "",
-    end_date: end_date.value ?? "",
-  });
-
-  // IMPORTANT: use the export route (not the fetch_url)
-  window.location.href = `/admin/report/visiting/export?${params.toString()}`;
 };
+const downloadExcel = () => {
+    const params = new URLSearchParams({
+        selected_dealer: selected_dealer.value,
+        selected_employee: selected_employee.value,
+        selected_order_status: selected_order_status.value,
+        selected_payment_status: selected_payment_status.value,
+        start_date: start_date.value,
+        end_date: end_date.value,
+    });
 
-
+    // IMPORTANT: use the export route (not the fetch_url)
+    window.location.href = `/admin/report/order/export?${params.toString()}`;
+};
 
 onMounted(fetchProducts);
 
@@ -221,15 +244,31 @@ defineExpose({
             </div>
             <div class="col-2">
                 <div class="form-group">
-                    <label for="status">Status</label>
+                    <label for="status">Order Status</label>
                     <select
                         class="form-control"
                         id="status"
-                        v-model="selected_status"
+                        v-model="selected_order_status"
                     >
                         <option value="all">All</option>
-                        <option value="visited">Visited</option>
-                        <option value="none-visited">None Visited</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Confirm">Confirm</option>
+                        <option value="Delivered">Delivered</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-2 p-0">
+                <div class="form-group">
+                    <label for="status">Payment Status</label>
+                    <select
+                        class="form-control"
+                        id="status"
+                        v-model="selected_payment_status"
+                        ;
+                    >
+                        <option value="all">All</option>
+                        <option value="done">Done</option>
+                        <option value="pending">Pending</option>
                     </select>
                 </div>
             </div>
@@ -243,10 +282,6 @@ defineExpose({
                     </button>
                 </div>
             </div>
-            <!-- <button class="download-btn btn-primary">
-                <i class="fas fa-download"></i>
-                Download Report
-            </button> -->
         </div>
         <vue3-datatable
             :rows="products"

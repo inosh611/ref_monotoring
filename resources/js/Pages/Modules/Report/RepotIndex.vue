@@ -4,6 +4,9 @@ import { Head } from "@inertiajs/vue3";
 import { ref } from "vue";
 import {fetchData} from "@/main"
 import CustomerWisedVisitsReport from "@/Components/Reports/CustomerWisedVisitsReport.vue";
+import DealersStockReport from "@/Components/Reports/DealersStockReport.vue";
+import CollectionsReports from "@/Components/Reports/CollectionsReports.vue";
+import OrderReports from "@/Components/Reports/OrderReports.vue";
 
 const reportCategory = ref("customer_wised_visits_report");
 
@@ -11,12 +14,12 @@ function  reportName() {
     switch (reportCategory.value) {
         case "customer_wised_visits_report":
             return "Customer Wised Visits Report";
-        case "collection":
-            return "Collection Summary";
-        case "outstanding":
-            return "Outstanding Dealer Balances";
-        case "target":
-            return "Target vs Achievement";
+        case "order_report":
+            return "Order Reports";
+        case "dealer_stock_report":
+            return "Dealer Stock Report";
+        case "collection_report":
+            return "Collection Report";
         default:
             return "";
     }
@@ -114,15 +117,14 @@ fetchData('/admin/dealer/all', dealers);
                                                         Customer Wised Visits
                                                         Report
                                                     </option>
-                                                    <option value="collection">
-                                                        Collection Summary
+                                                    <option value="dealer_stock_report">
+                                                        Dealers Stock Report 
                                                     </option>
-                                                    <option value="outstanding">
-                                                        Outstanding Dealer
-                                                        Balances
+                                                    <option value="collection_report">
+                                                        Collections Reports
                                                     </option>
-                                                    <option value="target">
-                                                        Target vs Achievement
+                                                    <option value="order_report">
+                                                        Orders Reports
                                                     </option>
                                                 </select>
                                             </div>
@@ -143,7 +145,7 @@ fetchData('/admin/dealer/all', dealers);
                             >
                                 <div class="flex-grow-1">
                                     <h3 class="card-title mb-1">
-                                        <i class="fas fa-filter mr-1"></i>
+                                        <i class="fas fa-user mr-1"></i>
                                         {{ reportName() }}
                                     </h3>
                                 </div>
@@ -157,6 +159,27 @@ fetchData('/admin/dealer/all', dealers);
                                           :employees="employees"
                                           :dealers="dealers"
                                           :fetch_url="'/admin/report/visiting'"
+                                        />
+                                    </div>
+                                    <div class="col-12" v-if="reportCategory == 'dealer_stock_report'">
+                                        <DealersStockReport 
+                                          :employees="employees"
+                                          :dealers="dealers"
+                                          :fetch_url="'/admin/report/visiting'"
+                                        />
+                                    </div>
+                                    <div class="col-12" v-if="reportCategory == 'collection_report'">
+                                        <CollectionsReports 
+                                          :employees="employees"
+                                          :dealers="dealers"
+                                          :fetch_url="'/admin/report/visiting'"
+                                        />
+                                    </div>
+                                    <div class="col-12" v-if="reportCategory == 'order_report'">
+                                        <OrderReports 
+                                          :employees="employees"
+                                          :dealers="dealers"
+                                          :fetch_url="'/admin/report/order'"
                                         />
                                     </div>
                                 </div>

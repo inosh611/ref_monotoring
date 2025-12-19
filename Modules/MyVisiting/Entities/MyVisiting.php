@@ -22,15 +22,16 @@ class MyVisiting extends Model
         'checkout_time',
         'checkout_date',
     ];
-    
+
     public function dealer()
     {
         return $this->belongsTo(Shop::class);
     }
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'ref_id', 'id');
     }
+
     protected static function newFactory()
     {
         return \Modules\MyVisiting\Database\factories\MyVisitingFactory::new();
