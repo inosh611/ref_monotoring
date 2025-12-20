@@ -2,12 +2,13 @@
 
 namespace Modules\Report\Http\Controllers;
 
-use Illuminate\Contracts\Support\Renderable;
+use App\Exports\OrderExport;
+use App\Exports\StockExport;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use App\Exports\CustomerWisedVisitsExport;
-use App\Exports\OrderExport;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\CustomerWisedVisitsExport;
+use Illuminate\Contracts\Support\Renderable;
 
 class ReportGenarateController extends Controller
 {
@@ -30,4 +31,14 @@ class ReportGenarateController extends Controller
         $fileName
     );
 }
+
+    public function exportStock(Request $request)
+    {
+        $fileName = 'Stock_Report_' . now()->format('Y_m_d_His') . '.xlsx';
+
+        return Excel::download(
+            new StockExport($request),
+            $fileName
+        );
+    }
 }

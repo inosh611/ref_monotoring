@@ -29,6 +29,8 @@ Route::prefix('admin/report')->group(function () {
         ->name('admin.report.visiting.export');
     Route::get('/order/export', [ReportGenarateController::class, 'exportOrder'])
         ->name('admin.report.order.export');
+    Route::get('/stock/export', [ReportGenarateController::class, 'exportStock'])
+        ->name('admin.report.stock.export');
 });
 
 
