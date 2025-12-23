@@ -23,6 +23,8 @@ Route::prefix('admin/report')->group(function () {
     Route::get('/', [ReportController::class, 'index'])->name('reports.index');
     Route::post('/visiting', [ReportController::class, 'customerWisedVisitsReport'])->name('visiting.report.filter');
     Route::post('/order', [ReportController::class, 'orderReport'])->name('order.report.filter');
+     Route::post('/collection', [ReportController::class, 'collectionReport'])->name('collectioin.report.filter');
+
 
     //Excel Export Route
     Route::get('/visiting/export', [ReportGenarateController::class, 'exportCustomerWisedVisits'])
@@ -31,6 +33,8 @@ Route::prefix('admin/report')->group(function () {
         ->name('admin.report.order.export');
     Route::get('/stock/export', [ReportGenarateController::class, 'exportStock'])
         ->name('admin.report.stock.export');
+        Route::get('/collection/export', [ReportGenarateController::class, 'exportCollectionReport'])
+        ->name('admin.report.collection.export');
 });
 
 

@@ -172,7 +172,7 @@ fetchData('/admin/dealer/all', dealers);
                                         <CollectionsReports 
                                           :employees="employees"
                                           :dealers="dealers"
-                                          :fetch_url="'/admin/report/visiting'"
+                                          :fetch_url="'/admin/report/collection'"
                                         />
                                     </div>
                                     <div class="col-12" v-if="reportCategory == 'order_report'">

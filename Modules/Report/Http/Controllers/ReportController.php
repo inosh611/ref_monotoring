@@ -5,9 +5,10 @@ namespace Modules\Report\Http\Controllers;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Modules\Orders\Entities\Order;
+use Modules\MyCollections\Entities\Payment;
 use Modules\MyVisiting\Entities\MyVisiting;
 use Illuminate\Contracts\Support\Renderable;
-use Modules\Orders\Entities\Order;
 
 class ReportController extends Controller
 {
@@ -156,6 +157,122 @@ class ReportController extends Controller
 
     $perPage = (int) ($request->per_page ?? 10);
 
+    $results = $query->paginate($perPage);
+
+    return response()->json([
+        'data' => $results->items(),
+        'total' => $results->total(),
+    ]);
+}
+ 
+
+public function collectionReport(Request $request)
+{
+    $query = Payment::query()
+        ->with([
+            'order.shop',
+            'order.user',
+            'user',
+            'cash',
+            'cheque',
+        ]);
+
+    // -------------------------
+    // Shop filter (via order)
+    // -------------------------
+    if ($request->filled('selected_shop') && $request->selected_shop !== 'all') {
+        $query->whereHas('order', function ($q) use ($request) {
+            $q->where('shop_id', $request->selected_shop);
+        });
+    }
+
+    // -------------------------
+    // Collector employee filter
+    // -------------------------
+    if ($request->filled('selected_employee') && $request->selected_employee !== 'all') {
+        $query->where('user_id', $request->selected_employee);
+    }
+
+    // -------------------------
+    // Collection type filter
+    // -------------------------
+    if ($request->filled('selected_collection_type') && $request->selected_collection_type !== 'all') {
+        $query->where('collection_type', $request->selected_collection_type);
+    }
+
+    // -------------------------
+    // Date range (payments created_at)
+    // -------------------------
+    if ($request->filled('start_date') && $request->filled('end_date')) {
+        $query->whereBetween('created_at', [
+            $request->start_date . ' 00:00:00',
+            $request->end_date . ' 23:59:59'
+        ]);
+    } elseif ($request->filled('start_date')) {
+        $query->where('created_at', '>=', $request->start_date . ' 00:00:00');
+    } elseif ($request->filled('end_date')) {
+        $query->where('created_at', '<=', $request->end_date . ' 23:59:59');
+    }
+
+    // -------------------------
+    // Search
+    // -------------------------
+    if ($request->filled('search')) {
+        $search = $request->search;
+
+        $query->where(function ($q) use ($search) {
+            $q->where('paid_amount', 'like', "%{$search}%")
+              ->orWhere('paid_amount_text', 'like', "%{$search}%")
+              ->orWhere('comment', 'like', "%{$search}%")
+              ->orWhere('collection_type', 'like', "%{$search}%")
+
+              ->orWhereHas('order', function ($oq) use ($search) {
+                  $oq->where('order_number', 'like', "%{$search}%");
+              })
+
+              ->orWhereHas('order.shop', function ($sq) use ($search) {
+                  $sq->where('business_name', 'like', "%{$search}%")
+                     ->orWhere('business_address', 'like', "%{$search}%")
+                     ->orWhere('business_tel', 'like', "%{$search}%");
+              })
+
+              ->orWhereHas('user', function ($uq) use ($search) {
+                  $uq->where('reg_number', 'like', "%{$search}%")
+                     ->orWhere('first_name', 'like', "%{$search}%")
+                     ->orWhere('last_name', 'like', "%{$search}%")
+                     ->orWhere('contact_number', 'like', "%{$search}%");
+              })
+
+              ->orWhereHas('cash', function ($cq) use ($search) {
+                  $cq->where('cash_receipt_number', 'like', "%{$search}%");
+              })
+
+              ->orWhereHas('cheque', function ($chq) use ($search) {
+                  $chq->where('cheque_number', 'like', "%{$search}%")
+                      ->orWhere('receipt_number', 'like', "%{$search}%")
+                      ->orWhere('bank', 'like', "%{$search}%")
+                      ->orWhere('branch', 'like', "%{$search}%");
+              });
+        });
+    }
+
+    // -------------------------
+    // Sorting (safe list)
+    // -------------------------
+    $allowedSortColumns = ['id', 'paid_amount', 'collection_type', 'created_at'];
+
+    $sortColumn = in_array($request->sort_column, $allowedSortColumns)
+        ? $request->sort_column
+        : 'id';
+
+    $sortDirection = $request->sort_direction === 'desc' ? 'desc' : 'asc';
+
+    $query->orderBy($sortColumn, $sortDirection);
+
+    // -------------------------
+    // Pagination
+    // -------------------------
+    $perPage = (int) ($request->per_page ?? 10);
     $results = $query->paginate($perPage);
 
     return response()->json([
