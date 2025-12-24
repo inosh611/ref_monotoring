@@ -14,13 +14,15 @@ use Modules\Orders\Http\Controllers\OrdersController;
 |
 */
 
-Route::prefix('orders')->group(function() {
+Route::prefix('orders')->group(function () {
     Route::get('/', 'OrdersController@index');
 });
 
-Route::prefix('admin/order')->group(function () {
-    Route::post('/data-table', [OrdersController::class, 'dataTable'])->name('order.datatable');
-    Route::get('/', [OrdersController::class, 'index'])->name('order.index');
-    Route::get('/create', [OrdersController::class, 'create'])->name('order.create');
-    Route::get('/edit/{id}', [OrdersController::class, 'edit'])->name('order.edit');
+Route::middleware('auth')->group(function () {
+    Route::prefix('admin/order')->group(function () {
+        Route::post('/data-table', [OrdersController::class, 'dataTable'])->name('order.datatable');
+        Route::get('/', [OrdersController::class, 'index'])->name('order.index');
+        Route::get('/create', [OrdersController::class, 'create'])->name('order.create');
+        Route::get('/edit/{id}', [OrdersController::class, 'edit'])->name('order.edit');
+    });
 });

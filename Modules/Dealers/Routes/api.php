@@ -32,5 +32,4 @@ Route::middleware(['web','auth'])->prefix('admin/dealer')->group(function() {
 Route::middleware(['web','auth'])->prefix('admin/dealer-stock')->group(function() {
     Route::get('search', [DealerStockController::class, 'search'])->name('dealer.stock.search');
     Route::post('/update', [DealerStockController::class, 'update'])->name('dealer.stock.update');
-
 });

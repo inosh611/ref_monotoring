@@ -19,7 +19,12 @@ use Modules\Report\Http\Controllers\ReportSendController;
 */
 
 
-Route::prefix('admin/report')->group(function () {
+
+
+//Send Daily Report Mail
+Route::middleware(['auth'])->group(function () {
+
+  Route::prefix('admin/report')->group(function () {
     Route::post('/data-table', [ProductController::class, 'dataTable'])->name('product.datatable');
     Route::get('/', [ReportController::class, 'index'])->name('reports.index');
     Route::post('/visiting', [ReportController::class, 'customerWisedVisitsReport'])->name('visiting.report.filter');
@@ -31,12 +36,7 @@ Route::prefix('admin/report')->group(function () {
     Route::get('/order/export', [ReportGenarateController::class, 'exportOrder'])->name('admin.report.order.export');
     Route::get('/stock/export', [ReportGenarateController::class, 'exportStock'])->name('admin.report.stock.export');
     Route::get('/collection/export', [ReportGenarateController::class, 'exportCollectionReport'])->name('admin.report.collection.export');
-
-    
+  });
+  
+  Route::post('/employee/report/send-daily', [ReportSendController::class, 'sendDaily']);
 });
-
-  //Send Daily Report Mail
-Route::middleware(['auth'])->group(function () {
-    Route::post('/employee/report/send-daily', [ReportSendController::class, 'sendDaily']);
-});
-

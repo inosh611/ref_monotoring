@@ -69,13 +69,14 @@ class MyVisitingRepository implements MyVisitingRepositoryInterface
 
     public function updateCheckOut($user_id, $dealer_id, array $data)
     {
+       
         $today = Carbon::today()->toDateString();
 
         $model = $this->model
             ->where('ref_id', $user_id)
             ->where('dealer_id', $dealer_id)
             ->whereDate('date', $today)
-            ->firstOrFail();
+            ->first();
 
        $checkOut =  $model->update($data);
        return $checkOut;

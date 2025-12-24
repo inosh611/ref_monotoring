@@ -14,18 +14,12 @@
 use Illuminate\Support\Facades\Route;
 use Modules\Employee\Http\Controllers\EmployeeController;
 
-Route::prefix('admin/employee')->group(function() {
-    Route::post('/data-table',[EmployeeController::class, 'dataTable'])->name('employee.dataTable');
-});//Please remove when Start backend
-
-Route::prefix('admin/employee')->group(function() {
-    Route::get('/',[EmployeeController::class, 'index'])->name('employee.index');
-});
-Route::prefix('admin/employee')->group(function() {
-    Route::get('/create',[EmployeeController::class, 'create'])->name('employee.create');
-});
-Route::prefix('admin/employee')->group(function() {
-    Route::get('/edit/{id}',[EmployeeController::class, 'edit'])->name('employee.edit');
-     Route::post('/all',[EmployeeController::class, 'all'])->name('employee.all');
-
+Route::middleware('auth')->group(function () {
+    Route::prefix('admin/employee')->group(function () {
+        Route::post('/data-table', [EmployeeController::class, 'dataTable'])->name('employee.dataTable');
+        Route::get('/', [EmployeeController::class, 'index'])->name('employee.index');
+        Route::get('/create', [EmployeeController::class, 'create'])->name('employee.create');
+        Route::get('/edit/{id}', [EmployeeController::class, 'edit'])->name('employee.edit');
+        Route::post('/all', [EmployeeController::class, 'all'])->name('employee.all');
+    });
 });

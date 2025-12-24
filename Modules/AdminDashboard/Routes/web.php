@@ -13,6 +13,9 @@
 use Illuminate\Support\Facades\Route;
 use Modules\AdminDashboard\Http\Controllers\LoginController;
 
-Route::prefix('admin')->group(function() {
+Route::middleware('auth')->group(function () {
+    Route::prefix('admin')->group(function() {
     Route::get('/dashboard', [LoginController::class, 'login'])->name('admin.dashboard.login');
+    });
 });
+

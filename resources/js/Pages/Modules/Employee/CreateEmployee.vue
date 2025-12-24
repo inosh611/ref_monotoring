@@ -153,24 +153,7 @@ async function handleSubmit() {
                     </div>
                 </div>
                 <!-- DataTable Row -->
-                <div class="row mt-4">
-                    <div class="col-12">
-                        <div class="card card-default">
-                            <div class="card-body" style="padding: 0px;">
-                                <DataTable
-                                    title="Employee TABLE"
-                                    fetch_url="/admin/employee/data-table"
-                                    :columns="employee_table_columns"
-                                    table_icon='<i class="nav-icon fas fa-archive" style="font-size: medium;"></i>'
-                                    modal_title="Employee"
-                                    edit_route_name = 'employee.edit'
-                                    delete_route_name= 'employee.delete'
-                                    view_button = false
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                
             </div>
         </section>
     </AdminLayout>

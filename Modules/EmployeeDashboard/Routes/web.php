@@ -18,8 +18,8 @@ Route::prefix('employeedashboard')->group(function() {
     Route::get('/', 'EmployeeDashboardController@index');
 });
 
-Route::prefix('employee/')->group(function () {
-    Route::get('/dashboard', [EmployeeDashboardController::class, 'index'])->name('employee.dashboard');
-   
-   
+Route::middleware('auth')->group(function () {
+    Route::prefix('employee/')->group(function () {
+        Route::get('/dashboard', [EmployeeDashboardController::class, 'index'])->name('employee.dashboard');
+    });
 });

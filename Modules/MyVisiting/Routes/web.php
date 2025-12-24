@@ -15,9 +15,10 @@ use Modules\MyVisiting\Http\Controllers\MyVisitingController;
 |
 */
 
-Route::prefix('admin/my-visiting')->group(function () {
-    Route::post('/data-table', [MyVisitingController::class, 'dataTable'])->name('my.visiting.datatable');
-    Route::get('/management', [MyVisitingController::class, 'index'])->name('submit.index');
-    Route::get('/submit-check-out', [MyVisitingController::class, 'checkIn'])->name('submit.check.in');
-    
+Route::middleware('auth')->group(function () {
+    Route::prefix('admin/my-visiting')->group(function () {
+        Route::post('/data-table', [MyVisitingController::class, 'dataTable'])->name('my.visiting.datatable');
+        Route::get('/management', [MyVisitingController::class, 'index'])->name('submit.index');
+        Route::get('/submit-check-out', [MyVisitingController::class, 'checkIn'])->name('submit.check.in');
+    });
 });

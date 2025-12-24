@@ -93,8 +93,19 @@ class MyVisitingController extends Controller
             'checkout_time' => $validated['checkout_time'],
             'checkout_date' => $validated['checkout_date']
         ];
-        $updateCheckOut = $this->myVisitingRepository->updateCheckOut($ref_id, $validated['dealer_id'], $updateData);
-        dd($updateCheckOut);
+        try {
+            $updateCheckOut = $this->myVisitingRepository->updateCheckOut($ref_id, $validated['dealer_id'], $updateData);
+            if ($updateCheckOut) {
+                 return response()->json([
+                'success' => true,
+                'message' => 'Your Visiting Successfully Checked Out.',
+                'redirect' => route('submit.index')
+                 ]);
+            } 
+        } catch (\Exception $error) {
+            dd($error->getMessage());
+            return response()->json(['error' => true, 'message' => $error->getMessage()]);
+        }
     }
     /**
      * Show the specified resource.

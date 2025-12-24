@@ -14,10 +14,12 @@ use Modules\Dealers\Http\Controllers\DealersController;
 |
 */
 
-Route::prefix('admin/dealer')->group(function () {
-    Route::post('/data-table', [DealersController::class, 'dataTable'])->name('dealer.datatable');
-    Route::get('/', [DealersController::class, 'index'])->name('dealer.index');
-    Route::get('/create', [DealersController::class, 'create'])->name('dealer.create');
-    Route::get('/edit/{id}', [DealersController::class, 'edit'])->name('dealer.edit');
-    Route::post('/all', [DealersController::class, 'dealerAll'])->name('dealer.all');
+Route::middleware(['web', 'auth'])->group(function () {
+    Route::prefix('admin/dealer')->group(function () {
+        Route::post('/data-table', [DealersController::class, 'dataTable'])->name('dealer.datatable');
+        Route::get('/', [DealersController::class, 'index'])->name('dealer.index');
+        Route::get('/create', [DealersController::class, 'create'])->name('dealer.create');
+        Route::get('/edit/{id}', [DealersController::class, 'edit'])->name('dealer.edit');
+        Route::post('/all', [DealersController::class, 'dealerAll'])->name('dealer.all');
+    });
 });

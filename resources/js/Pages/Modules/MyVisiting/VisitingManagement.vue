@@ -3,12 +3,12 @@ import AdminLayout from "@/Layouts/Admin/AdminLayout.vue";
 import DataTable from "@/Components/Admin/DataTable.vue";
 import { Head } from "@inertiajs/vue3";
 import { onMounted, ref } from "vue";
-import { store } from '../../../main';
+import { store, fetchData } from '../../../main';
 const formRef = ref(null);
 const time = ref("");
 const date = ref("");
 const dealer_id = ref("");
-
+const dealers = ref([]);
 const props = defineProps({
     roles: Array,
     myVisiting: Array,
@@ -122,7 +122,11 @@ function ChangeDealer(event) {
     time.value = getCurrentTime();
     date.value = getCurrentDate();
 }
-onMounted(() => {});
+onMounted(() => {
+    // Fetch dealers data from the server
+    fetchData('/admin/dealer/all', dealers);
+    console.log("Dealers fetched:", dealers.value);
+});
 </script>
 
 <template>
@@ -222,6 +226,7 @@ onMounted(() => {});
                     ref="formRef"
                 >
                     <div class="modal-body">
+                        
                         <div class="row">
                             <div class="form-row">
                                 <div class="col-12 mb-3">
