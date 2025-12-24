@@ -5,6 +5,7 @@ use Modules\Product\Http\Controllers\UnitController;
 use Modules\Report\Http\Controllers\ReportController;
 use Modules\Product\Http\Controllers\ProductController;
 use Modules\Report\Http\Controllers\ReportGenarateController;
+use Modules\Report\Http\Controllers\ReportSendController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,18 +24,19 @@ Route::prefix('admin/report')->group(function () {
     Route::get('/', [ReportController::class, 'index'])->name('reports.index');
     Route::post('/visiting', [ReportController::class, 'customerWisedVisitsReport'])->name('visiting.report.filter');
     Route::post('/order', [ReportController::class, 'orderReport'])->name('order.report.filter');
-     Route::post('/collection', [ReportController::class, 'collectionReport'])->name('collectioin.report.filter');
-
+    Route::post('/collection', [ReportController::class, 'collectionReport'])->name('collectioin.report.filter');
 
     //Excel Export Route
-    Route::get('/visiting/export', [ReportGenarateController::class, 'exportCustomerWisedVisits'])
-        ->name('admin.report.visiting.export');
-    Route::get('/order/export', [ReportGenarateController::class, 'exportOrder'])
-        ->name('admin.report.order.export');
-    Route::get('/stock/export', [ReportGenarateController::class, 'exportStock'])
-        ->name('admin.report.stock.export');
-        Route::get('/collection/export', [ReportGenarateController::class, 'exportCollectionReport'])
-        ->name('admin.report.collection.export');
+    Route::get('/visiting/export', [ReportGenarateController::class, 'exportCustomerWisedVisits'])->name('admin.report.visiting.export');
+    Route::get('/order/export', [ReportGenarateController::class, 'exportOrder'])->name('admin.report.order.export');
+    Route::get('/stock/export', [ReportGenarateController::class, 'exportStock'])->name('admin.report.stock.export');
+    Route::get('/collection/export', [ReportGenarateController::class, 'exportCollectionReport'])->name('admin.report.collection.export');
+
+    
 });
 
+  //Send Daily Report Mail
+Route::middleware(['auth'])->group(function () {
+    Route::post('/employee/report/send-daily', [ReportSendController::class, 'sendDaily']);
+});
 

@@ -13,13 +13,14 @@ const props = defineProps({
     weeklyVisits: Array,
     weeklyCollections: Array,
     confirmedOrders: Array,
+    todayExpectedCollections: Array,
 });
 // ---- STATIC KPI DATA (FOR ONE EMPLOYEE / SALES REP) ----
 const employeeName = "Inosh Perera";
 
 const todayVisits = 7;
 const completedVisits = 5;
-const monthlyTarget =  props.employeeTarget.target_value; // LKR
+const monthlyTarget = props.employeeTarget.target_value; // LKR
 const monthlyAchieved = props.employeeTarget.achieved_value; // LKR
 const targetProgress = Math.round((monthlyAchieved / monthlyTarget) * 100);
 
@@ -27,6 +28,20 @@ const targetProgress = Math.round((monthlyAchieved / monthlyTarget) * 100);
 const now = ref(new Date());
 const sessionSeconds = ref(0);
 let timerId = null;
+
+const sending = ref(false);
+
+const sendReport = async () => {
+    sending.value = true;
+    try {
+        await axios.post("/employee/report/send-daily"); // route below
+        alert("Report request sent. Admin will receive the PDF soon.");
+    } catch (e) {
+        alert("Failed to send report.");
+    } finally {
+        sending.value = false;
+    }
+};
 
 function getDistanceInMeters(lat1, lon1, lat2, lon2) {
     const R = 6371000;
@@ -200,45 +215,6 @@ const adminMessages = [
         snippet: "Double-check cheque details before submitting collection.",
         time: "Yesterday • 05:40 PM",
         unread: false,
-    },
-];
-
-// ---- STATIC EXPECTED ORDERS & EXPECTED COLLECTIONS ----
-const expectedOrders = [
-    {
-        id: 1,
-        dealer_name: "Sunil Distributors - Matale",
-        telephone: "077 456 7890",
-        expected_date: "Today",
-        comment: "Need 20ctn – 500g packets",
-        status: "Pending",
-    },
-    {
-        id: 2,
-        dealer_name: "City Super Mart - Colombo 10",
-        telephone: "071 222 3344",
-        expected_date: "Tomorrow",
-        comment: "Price confirmation required",
-        status: "Follow-up",
-    },
-];
-
-const expectedCollections = [
-    {
-        id: 1,
-        dealer_name: "Ranjan Stores - Kurunegala",
-        telephone: "077 123 4567",
-        expected_date: "Today",
-        amount: 15000,
-        status: "Due Today",
-    },
-    {
-        id: 2,
-        dealer_name: "Lakmini Traders - Kandy",
-        telephone: "076 555 8899",
-        expected_date: "In 2 days",
-        amount: 25000,
-        status: "Upcoming",
     },
 ];
 
@@ -602,11 +578,13 @@ onMounted(() => {
                                                 label: 'Update Stock',
                                                 link: 'stock.odit.create',
                                             },
-                                        
                                         ]"
                                         :key="action.label"
                                     >
-                                        <a :href="route(action.link)" style="text-decoration: none;">
+                                        <a
+                                            :href="route(action.link)"
+                                            style="text-decoration: none"
+                                        >
                                             <button
                                                 type="button"
                                                 class="btn btn-sm btn-quick-action btn-block"
@@ -772,6 +750,18 @@ onMounted(() => {
                                 <span class="text-muted small">
                                     Your shop visits and collections for today.
                                 </span>
+                                <button
+                                    class="btn btn-primary"
+                                    @click="sendReport"
+                                    :disabled="sending"
+                                >
+                                    <i class="fas fa-paper-plane mr-1"></i>
+                                    {{
+                                        sending
+                                            ? "Sending..."
+                                            : "Send Daily Report to Admin"
+                                    }}
+                                </button>
                             </div>
                             <div class="card-body p-0">
                                 <div class="table-responsive">
@@ -906,13 +896,26 @@ onMounted(() => {
                                         </thead>
                                         <tbody>
                                             <tr
-                                                v-for="(ord, index ) in confirmedOrders"
+                                                v-for="(
+                                                    ord, index
+                                                ) in confirmedOrders"
                                                 :key="ord.id"
                                             >
                                                 <td>{{ index + 1 }}</td>
-                                                <td>{{ ord.shop.business_name}} - {{ ord.shop.business_address }}</td>
+                                                <td>
+                                                    {{ ord.shop.business_name }}
+                                                    -
+                                                    {{
+                                                        ord.shop
+                                                            .business_address
+                                                    }}
+                                                </td>
                                                 <td>{{ ord.order_number }}</td>
-                                                <td>{{ ord.expected_order_date }}</td>
+                                                <td>
+                                                    {{
+                                                        ord.expected_order_date
+                                                    }}
+                                                </td>
                                                 <td>
                                                     <span
                                                         class="badge badge-pill"
@@ -951,49 +954,121 @@ onMounted(() => {
                             </div>
                             <div class="card-body p-0">
                                 <div class="table-responsive">
-                                    <table class="table mb-0">
+                                    <table class="table mb-0 table-hover">
                                         <thead class="thead-light">
                                             <tr>
-                                                <th>#</th>
+                                                <th style="width: 50px">#</th>
                                                 <th>Dealer</th>
-                                                <th>Telephone</th>
+                                                <th>Invoice</th>
                                                 <th>Expected</th>
                                                 <th class="text-right">
-                                                    Amount (LKR)
+                                                    Total (LKR)
                                                 </th>
-                                                <th>Status</th>
+                                                <th class="text-right">
+                                                    Paid (LKR)
+                                                </th>
+                                                <th class="text-right">
+                                                    Balance (LKR)
+                                                </th>
+                                                <th style="width: 110px">
+                                                    Status
+                                                </th>
                                             </tr>
                                         </thead>
-                                        <tbody>
+
+                                        <tbody
+                                            v-if="
+                                                props.todayExpectedCollections &&
+                                                props.todayExpectedCollections
+                                                    .length
+                                            "
+                                        >
                                             <tr
-                                                v-for="col in expectedCollections"
+                                                v-for="(
+                                                    col, index
+                                                ) in props.todayExpectedCollections"
                                                 :key="col.id"
                                             >
-                                                <td>{{ col.id }}</td>
-                                                <td>{{ col.dealer_name }}</td>
-                                                <td>{{ col.telephone }}</td>
-                                                <td>{{ col.expected_date }}</td>
+                                                <td>{{ index + 1 }}</td>
+
+                                                <td>
+                                                    <div
+                                                        class="font-weight-semibold"
+                                                    >
+                                                        {{ col.dealer_name }}
+                                                    </div>
+                                                    <div
+                                                        class="text-muted small"
+                                                    >
+                                                        {{ col.telephone }}
+                                                    </div>
+                                                </td>
+
+                                                <td>
+                                                    {{
+                                                        col.order_number ?? "-"
+                                                    }}
+                                                </td>
+
+                                                <td>
+                                                    {{
+                                                        col.expected_date ?? "-"
+                                                    }}
+                                                </td>
+
                                                 <td class="text-right">
                                                     {{
-                                                        col.amount.toLocaleString(
+                                                        Number(
+                                                            col.total_price ?? 0
+                                                        ).toLocaleString(
                                                             "en-LK"
                                                         )
                                                     }}
                                                 </td>
+
+                                                <td class="text-right">
+                                                    {{
+                                                        Number(
+                                                            col.paid_amount ?? 0
+                                                        ).toLocaleString(
+                                                            "en-LK"
+                                                        )
+                                                    }}
+                                                </td>
+
+                                                <td
+                                                    class="text-right font-weight-bold"
+                                                >
+                                                    {{
+                                                        Number(
+                                                            col.balance ?? 0
+                                                        ).toLocaleString(
+                                                            "en-LK"
+                                                        )
+                                                    }}
+                                                </td>
+
                                                 <td>
                                                     <span
-                                                        class="badge badge-pill"
-                                                        :class="{
-                                                            'badge-danger':
-                                                                col.status ===
-                                                                'Due Today',
-                                                            'badge-secondary':
-                                                                col.status ===
-                                                                'Upcoming',
-                                                        }"
+                                                        class="badge badge-pill p-2 badge-warning"
                                                     >
-                                                        {{ col.status }}
+                                                        {{
+                                                            col.status ??
+                                                            "Pending"
+                                                        }}
                                                     </span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+
+                                        <tbody v-else>
+                                            <tr>
+                                                <td
+                                                    colspan="8"
+                                                    class="text-center py-4 text-muted"
+                                                >
+                                                    No pending collections for
+                                                    today.
                                                 </td>
                                             </tr>
                                         </tbody>
