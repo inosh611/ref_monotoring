@@ -62,11 +62,6 @@ onMounted(() => {});
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-12">
-                        <a href=""
-                            ><button class="btn btn-primary mr-2">
-                                Export Collection
-                            </button></a
-                        >
                         <a :href="route('my.collection.create')"
                             ><button class="btn btn-primary mr-2">
                                 Create Collection
