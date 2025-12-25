@@ -80,7 +80,7 @@ onMounted(() => {});
                                     :columns="customer_table_columns"
                                     table_icon='<i class="nav-icon fas fa-archive" style="font-size: medium;"></i>'
                                     modal_title="Order"
-                                    edit_route_name="order.edit"
+                                    edit_route_name="my.collection.edit"
                                     delete_route_name="order.delete"
                                     view_button="false"
                                 />

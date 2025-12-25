@@ -6,11 +6,13 @@ use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
+use Modules\Orders\Entities\Order;
+use Modules\MyCollections\Entities\Payment;
 use Illuminate\Contracts\Support\Renderable;
+use Modules\Orders\Repositories\Interfaces\OrderRepositoryInterface;
 use Modules\MyCollections\Repositories\Interfaces\CashRepositoryInterface;
 use Modules\MyCollections\Repositories\Interfaces\ChequeRepositoryInterface;
 use Modules\MyCollections\Repositories\Interfaces\PaymentRepositoryInterface;
-use Modules\Orders\Repositories\Interfaces\OrderRepositoryInterface;
 
 class MyCollectionsController extends Controller
 {
@@ -200,18 +202,117 @@ class MyCollectionsController extends Controller
      */
     public function edit($id)
     {
-        return view('mycollections::edit');
+        $payment = Payment::with(['order', 'cash', 'cheque'])->findOrFail($id);
+
+        return Inertia::render('Modules/MyCollection/EditCollection', [
+            'payment' => $payment,
+        ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     * @param Request $request
-     * @param int $id
-     * @return Renderable
-     */
-    public function update(Request $request, $id)
+    // ✅ UPDATE without id in URL, get it from request
+    public function update(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'id' => ['required', 'integer'],
+            'collection_type' => ['required', 'in:1,2'],
+            'order_number' => ['required'],
+            'comment' => ['nullable', 'string'],
+        ]);
+
+        $payment = Payment::with(['cash', 'cheque', 'order'])->findOrFail($validated['id']);
+
+        // ✅ change this if your column name differs
+        $order = Order::where('order_number', $validated['order_number'])->first();
+        if (!$order) {
+            return response()->json([
+                'message' => 'Order not found.',
+                'redirect' => url()->previous(),
+            ], 422);
+        }
+
+        DB::transaction(function () use ($request, $validated, $payment, $order) {
+
+            // update payment common
+            $payment->update([
+                'order_id' => $order->id,
+                'collection_type' => (int) $validated['collection_type'],
+                'comment' => $validated['comment'] ?? null,
+            ]);
+
+            // ✅ cheque update
+            if ((int)$validated['collection_type'] === 1) {
+
+                $typeData = $request->validate([
+                    'cheque_number' => ['required', 'string'],
+                    'bank' => ['required', 'string'],
+                    'branch' => ['required', 'string'],
+                    'cheque_date' => ['required', 'date'],
+                    'cheque_amount' => ['required', 'numeric', 'min:0.01'],
+                    'cheque_amount_text' => ['required', 'string'],
+                    'cheque_type' => ['required', 'string'],
+                    'receipt_number' => ['required', 'string'],
+                ]);
+
+                $payment->update([
+                    'paid_amount' => $typeData['cheque_amount'],
+                    'paid_amount_text' => $typeData['cheque_amount_text'],
+                ]);
+
+                $payment->cheque()->updateOrCreate(
+                    ['payment_id' => $payment->id],
+                    [
+                        'cheque_number' => $typeData['cheque_number'],
+                        'bank' => $typeData['bank'],
+                        'branch' => $typeData['branch'],
+                        'cheque_date' => $typeData['cheque_date'],
+                        'cheque_amount' => $typeData['cheque_amount'],
+                        'cheque_amount_text' => $typeData['cheque_amount_text'],
+                        'cheque_type' => $typeData['cheque_type'],
+                        'receipt_number' => $typeData['receipt_number'],
+                    ]
+                );
+
+                // remove cash if existed
+                $payment->cash()->delete();
+            }
+
+            // ✅ cash update
+            if ((int)$validated['collection_type'] === 2) {
+
+                $typeData = $request->validate([
+                    'cash_amount' => ['required', 'numeric', 'min:0.01'],
+                    'cash_amount_text' => ['required', 'string'],
+                    'cash_receipt_number' => ['required', 'string'],
+                ]);
+
+                $payment->update([
+                    'paid_amount' => $typeData['cash_amount'],
+                    'paid_amount_text' => $typeData['cash_amount_text'],
+                ]);
+
+                $payment->cash()->updateOrCreate(
+                    ['payment_id' => $payment->id],
+                    [
+                        'cash_amount' => $typeData['cash_amount'],
+                        'cash_amount_text' => $typeData['cash_amount_text'],
+                        'cash_receipt_number' => $typeData['cash_receipt_number'],
+                    ]
+                );
+
+                // remove cheque if existed
+                $payment->cheque()->delete();
+            }
+
+            // ✅ optional: recalc order paid amount
+            $order->update([
+                'paid_amount' => Payment::where('order_id', $order->id)->sum('paid_amount')
+            ]);
+        });
+
+        return response()->json([
+            'message' => 'Collection updated successfully.',
+            'redirect' => route('my.collection.index'),
+        ]);
     }
 
     /**
